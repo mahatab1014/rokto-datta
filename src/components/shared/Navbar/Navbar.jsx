@@ -2,7 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import LogoBangla from "../../../assets/images/logo/rokto-datta-ban.png";
 import { useState } from "react";
 import Container from "../../ui/Container/Container";
-import { Button } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 
 const Navbar = () => {
   const [isChecked, setIsChecked] = useState(false);
@@ -23,6 +23,10 @@ const Navbar = () => {
     {
       name: "Contact",
       path: "/contact",
+    },
+    {
+      name: "Dashboard",
+      path: "/dashboard",
     },
   ];
 
@@ -64,17 +68,115 @@ const Navbar = () => {
                             : "nav-link-style-remove"
                         }
                       >
-                        <Button variant="text" className="!text-neutral !font-normal">
+                        <Button
+                          variant="text"
+                          className="!text-neutral !font-normal"
+                        >
                           {menu.name}
                         </Button>
                       </NavLink>
                     </li>
                   ))}
+                  <li >
+                    <NavLink
+                      to="/sign-in"
+                      className={({ isActive, isPending }) =>
+                        isPending
+                          ? "pending"
+                          : isActive
+                          ? "nav-link-style-remove [&>button]:!font-bold"
+                          : "nav-link-style-remove"
+                      }
+                    >
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal"
+                      >
+                        Sign In
+                      </Button>
+                    </NavLink>
+                  </li>
                 </ul>
+
+                <div className="dropdown dropdown-end">
+                  <div tabIndex={0} role="button" className="">
+                    <Avatar
+                      alt="Remy Sharp"
+                      src="/static/images/avatar/1.jpg"
+                    />
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-40 [&>li>button]:!normal-case [&>li>button]:!font-semibold"
+                  >
+                    <li>
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal active:!bg-white"
+                      >
+                        Profile
+                      </Button>
+                    </li>
+                    <li>
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal active:!bg-white"
+                      >
+                        Settings
+                      </Button>
+                    </li>
+                    <li>
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal active:!bg-white"
+                      >
+                        Logout
+                      </Button>
+                    </li>
+                  </ul>
+                </div>
               </div>
 
               <div className="flex-none lg:hidden">
-                <div>
+                <div className="dropdown dropdown-end">
+                  <div tabIndex={0} role="button" className="">
+                    <Avatar
+                      sx={{ width: 30, height: 30 }}
+                      alt="Remy Sharp"
+                      src="/static/images/avatar/1.jpg"
+                    />
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    <li>
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal active:!bg-white"
+                      >
+                        Profile
+                      </Button>
+                    </li>
+                    <li>
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal active:!bg-white"
+                      >
+                        Settings
+                      </Button>
+                    </li>
+                    <li>
+                      <Button
+                        variant="text"
+                        className="!text-neutral !font-normal active:!bg-white"
+                      >
+                        Logout
+                      </Button>
+                    </li>
+                  </ul>
+                </div>
+                <div className="pl-8">
                   <svg
                     onClick={handleInputChange}
                     className={`fill-current ${isChecked === true && "hidden"}`}
