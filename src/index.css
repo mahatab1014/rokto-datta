@@ -45,3 +45,7 @@
 .post-form-field {
   @apply w-full py-3 px-2 border border-gray-300 hover:border-gray-500 focus:border-blue-500 rounded-sm outline-none;
 }
+
+.label-style label {
+  @apply font-medium text-gray-500;
+}

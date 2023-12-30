@@ -6,6 +6,8 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import useDivisions from "../../../hooks/useDivisions";
 import useDistricts from "../../../hooks/useDistricts";
 import { styled } from "@mui/material/styles";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const CreatePost = () => {
   const { user } = {};
@@ -48,6 +50,12 @@ const CreatePost = () => {
     width: 1,
   });
 
+  const [selectedDate, setSelectedDate] = useState(null);
+  console.log(selectedDate);
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
   const handlePost = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -74,6 +82,8 @@ const CreatePost = () => {
       division_name: division_name,
       district_name: district_name,
       upazilla_name: upazilla_name,
+      posted_at: new Date(),
+      blood_need_deadline: selectedDate,
       author: {
         name: user?.displayName,
         uid: user?.uid,
@@ -85,7 +95,7 @@ const CreatePost = () => {
 
   return (
     <>
-      <div className="p-6 bg-base-100 border rounded">
+      <div className="p-3 sm:p-6 bg-base-100 border rounded">
         <div className="flex gap-5">
           <figure className="">
             <Avatar
@@ -97,7 +107,7 @@ const CreatePost = () => {
             onClick={() =>
               document.getElementById("post_modal_show").showModal()
             }
-            className="cursor-pointer flex items-center rounded-full w-full bg-[#f3f4f6] text-gray-600 px-5 font-medium"
+            className="text-sm sm:text-base cursor-pointer flex items-center rounded-full w-full bg-[#f3f4f6] text-gray-600 px-3 sm:px-5 font-medium"
           >
             Need any type of blood?
           </div>
@@ -129,17 +139,17 @@ const CreatePost = () => {
 
       <dialog
         id="post_modal_show"
-        className="modal modal-bottom sm:modal-middle"
+        className="modal modal-bottom sm:modal-middle backdrop-blur-sm"
       >
         <div className="modal-box">
           <h3 className="font-bold text-lg border-b-2 mb-3">Create Post</h3>
           <div>
-            <form className="space-y-2" onSubmit={handlePost}>
+            <form className="space-y-2 label-style" onSubmit={handlePost}>
               <div>
                 <Button
                   component="label"
                   variant="contained"
-                  className="!normal-case w-full"
+                  className="!normal-case w-full !text-white"
                   startIcon={<FaCloudUploadAlt />}
                 >
                   Upload Image
@@ -151,6 +161,7 @@ const CreatePost = () => {
                 <input
                   id="title"
                   name="title"
+                  placeholder="write title"
                   className="post-form-field"
                   required
                 />
@@ -159,6 +170,7 @@ const CreatePost = () => {
                 <label htmlFor="description">Description</label>
                 <textarea
                   className="post-form-field"
+                  placeholder="write description about your patient"
                   name="description"
                   id="description"
                   required
@@ -200,6 +212,27 @@ const CreatePost = () => {
                   </select>
                 </div>
               </div>
+
+              <div className="[&>div]:w-full">
+                <label htmlFor="date_time" className="block">
+                  Pick Date and Time
+                </label>
+                <DatePicker
+                  id="date_time"
+                  className="post-form-field !w-full"
+                  selected={selectedDate}
+                  onChange={handleDateChange}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  timeCaption="Time"
+                  dateFormat="dd, MM, yyyy | h:mm aa"
+                  minDate={new Date()}
+                  placeholderText="Ex: 01, 05, 2025 | 11:30 PM"
+                  required
+                />
+              </div>
+
               <div>
                 <label htmlFor="phone">Your Phone Number</label>
                 <input
