@@ -85,7 +85,7 @@ const CreatePost = () => {
 
   return (
     <>
-      <div className="p-6 bg-base-100">
+      <div className="p-6 bg-base-100 border rounded">
         <div className="flex gap-5">
           <figure className="">
             <Avatar
@@ -93,20 +93,32 @@ const CreatePost = () => {
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
             />
           </figure>
-          <div className="cursor-pointer flex items-center rounded-full w-full bg-[#f3f4f6] text-gray-600 px-5 font-medium">
+          <div
+            onClick={() =>
+              document.getElementById("post_modal_show").showModal()
+            }
+            className="cursor-pointer flex items-center rounded-full w-full bg-[#f3f4f6] text-gray-600 px-5 font-medium"
+          >
             Need any type of blood?
           </div>
         </div>
         <div className="flex justify-between mt-5">
           <div>
-            <Button className="space-x-2 !normal-case">
+            <Button
+              onClick={() =>
+                document.getElementById("post_modal_show").showModal()
+              }
+              className="space-x-2 !normal-case"
+            >
               <FaRegImage className="text-[#ff1e56] text-lg" />
               <span className="text-gray-600">Photo / Video</span>
             </Button>
           </div>
           <div>
             <Button
-              onClick={() => document.getElementById("my_modal_5").showModal()}
+              onClick={() =>
+                document.getElementById("post_modal_show").showModal()
+              }
               className="!normal-case bg-gradient-to-r from-[#e855de] to-[#5400ee] !text-gray-100"
             >
               Create Post
@@ -115,7 +127,10 @@ const CreatePost = () => {
         </div>
       </div>
 
-      <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+      <dialog
+        id="post_modal_show"
+        className="modal modal-bottom sm:modal-middle"
+      >
         <div className="modal-box">
           <h3 className="font-bold text-lg border-b-2 mb-3">Create Post</h3>
           <div>
@@ -181,6 +196,7 @@ const CreatePost = () => {
                   >
                     <option selected>None</option>
                     <option value="urgent">Urgent</option>
+                    <option value="event">Event</option>
                   </select>
                 </div>
               </div>
