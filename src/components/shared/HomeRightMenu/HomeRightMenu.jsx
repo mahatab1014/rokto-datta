@@ -43,6 +43,17 @@ const HomeRightMenu = () => {
             <span>Urgent Blood</span>
           </NavLink>
         </li>
+        <li>
+          <NavLink
+            className={`menu-list ${
+              postTypeParam === "event" ? "!border-gray-300 !bg-gray-100" : ""
+            }`}
+            to="/?postType=event"
+          >
+            <FaDroplet className="text-[#f85b43]" />
+            <span>Blood Donation Event</span>
+          </NavLink>
+        </li>
       </ul>
     </>
   );
