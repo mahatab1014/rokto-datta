@@ -10,3 +10,9 @@
 .menu-list span {
   @apply text-sm font-semibold;
 }
+.nav-link-style-remove {
+  @apply !rounded-none !bg-transparent active:!bg-transparent active:!text-neutral !p-0;
+}
+.post-form-field {
+  @apply w-full py-3 px-2 border border-gray-300 hover:border-gray-500 focus:border-blue-500 rounded-sm outline-none;
+}

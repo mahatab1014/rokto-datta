@@ -11,6 +11,12 @@ const PublicRoutes = createBrowserRouter([
         index: true,
         element: <Home />,
       },
+      {
+        path: "blood-donors",
+      },
+      {
+        path: "contact",
+      },
     ],
   },
 ]);

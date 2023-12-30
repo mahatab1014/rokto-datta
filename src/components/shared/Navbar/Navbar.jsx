@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import LogoBangla from "../../../assets/images/logo/rokto-datta-ban.png";
 import { useState } from "react";
 import Container from "../../ui/Container/Container";
+import { Button } from "@mui/material";
 
 const Navbar = () => {
   const [isChecked, setIsChecked] = useState(false);
@@ -53,7 +54,20 @@ const Navbar = () => {
                 <ul className="menu menu-horizontal py-0">
                   {menuLinks.map((menu, index) => (
                     <li key={index}>
-                      <NavLink to={menu?.path}>{menu.name}</NavLink>
+                      <NavLink
+                        to={menu?.path}
+                        className={({ isActive, isPending }) =>
+                          isPending
+                            ? "pending"
+                            : isActive
+                            ? "nav-link-style-remove [&>button]:!font-bold"
+                            : "nav-link-style-remove"
+                        }
+                      >
+                        <Button variant="text" className="!text-neutral !font-normal">
+                          {menu.name}
+                        </Button>
+                      </NavLink>
                     </li>
                   ))}
                 </ul>
