@@ -4,6 +4,8 @@ import {
   Checkbox,
   Divider,
   FormControlLabel,
+  IconButton,
+  InputAdornment,
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -15,9 +17,32 @@ import DomHead from "../../components/shared/DomHead/DomHead";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignUp = () => {
   const [selectedImage, setSelectedImage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPass, setConfirmPass] = useState("");
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    const form = e.target;
+    const firstName = form.f_name.value;
+    const lastName = form.l_name.value;
+    const profilePicture = form.profile_pic.files[0];
+    const password = form.password.value;
+
+    if (password !== confirmPass) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+  };
 
   const handleImage = (e) => {
     const image = e.target.files[0];
@@ -58,16 +83,22 @@ const SignUp = () => {
                 <img className="h-12" src={LogoBan} alt="Rokto Datta" />
               </picture>
               <ContinueWithAccount />
-              <form className="space-y-3">
+              <form className="space-y-3" onSubmit={handleSignUp}>
                 <div className="text-center">
-                  {/* <div className="text-2xl">Welcome Back</div> */}
-                  <Divider className="pt-3 text-sm">Login With E-mail</Divider>
+                  <Divider className="pt-3 text-sm">Sign Up Here</Divider>
                 </div>
+
+                {errorMessage && (
+                  <div className="text-lg bg-error text-white px-2">
+                    {errorMessage}
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   <TextField
                     type="text"
                     className="w-full"
-                    id="filled-basic"
+                    id="f_name"
                     label="First Name"
                     name="f_name"
                     variant="filled"
@@ -76,7 +107,7 @@ const SignUp = () => {
                   <TextField
                     type="text"
                     className="w-full"
-                    id="filled-basic"
+                    id="l_name"
                     label="Last Name"
                     name="l_name"
                     variant="filled"
@@ -100,9 +131,10 @@ const SignUp = () => {
                 >
                   Upload Profile Picture
                   <VisuallyHiddenInput
+                    id="profile_pic"
                     type="file"
                     onChangeCapture={handleImage}
-                    name="image"
+                    name="profile_pic"
                     accept="image/*"
                   />
                 </Button>
@@ -110,25 +142,43 @@ const SignUp = () => {
                 <TextField
                   type="email"
                   className="w-full"
-                  id="filled-basic"
+                  id="email"
                   label="E-mail"
                   name="email"
                   variant="filled"
                   required
                 />
                 <TextField
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   className="w-full"
-                  id="filled-basic"
+                  id="password"
                   label="Password"
                   name="password"
                   variant="filled"
                   required
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleTogglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <AiOutlineEye />
+                          ) : (
+                            <AiOutlineEyeInvisible />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <TextField
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   className="w-full"
-                  id="filled-basic"
+                  onChange={(e) => setConfirmPass(e.target.value)}
+                  id="confirm_password"
                   label="Confirm Password"
                   name="confirm_password"
                   variant="filled"
@@ -140,6 +190,7 @@ const SignUp = () => {
                     label={
                       <span className="text-sm">Agree to Privacy Policy</span>
                     }
+                    required
                   />
                   <Button type="submit" variant="contained">
                     Sign Up

@@ -3,6 +3,8 @@ import {
   Checkbox,
   Divider,
   FormControlLabel,
+  IconButton,
+  InputAdornment,
   TextField,
 } from "@mui/material";
 import Container from "../../components/ui/Container/Container";
@@ -10,8 +12,23 @@ import LogoBan from "../../assets/images/logo/rokto-datta-ban.png";
 import ContinueWithAccount from "./ContinueWithAccount";
 import DomHead from "../../components/shared/DomHead/DomHead";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignIn = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    const form = e.target;
+    const email = form.emai.value;
+    const password = form.password.value;
+  };
+
   return (
     <>
       <DomHead title="Sign In" />
@@ -23,11 +40,17 @@ const SignIn = () => {
                 <img className="h-12" src={LogoBan} alt="Rokto Datta" />
               </picture>
               <ContinueWithAccount />
-              <form className="space-y-3">
+              <form className="space-y-3" onSubmit={handleSignIn}>
                 <div className="text-center">
                   {/* <div className="text-2xl">Welcome Back</div> */}
                   <Divider className="pt-3 text-sm">Login With E-mail</Divider>
                 </div>
+                {errorMessage && (
+                  <div className="text-lg bg-error text-white px-2">
+                    {errorMessage}
+                  </div>
+                )}
+
                 <TextField
                   type="email"
                   className="w-full"
@@ -38,13 +61,30 @@ const SignIn = () => {
                   required
                 />
                 <TextField
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   className="w-full"
                   id="filled-basic"
                   label="Password"
                   name="password"
                   variant="filled"
                   required
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleTogglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <AiOutlineEye />
+                          ) : (
+                            <AiOutlineEyeInvisible />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <div className="flex justify-between [&>label>span>svg]:!w-5">
                   <FormControlLabel
