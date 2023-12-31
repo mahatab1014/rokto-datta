@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   Checkbox,
   Divider,
@@ -18,6 +17,8 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import useAuth from "../../hooks/useAuth";
+import { uploadImageImgBB } from "../../utility/utility";
 
 const SignUp = () => {
   const [selectedImage, setSelectedImage] = useState("");
@@ -28,6 +29,8 @@ const SignUp = () => {
     setShowPassword(!showPassword);
   };
 
+  const { signUpUser, updateUserProfile } = useAuth();
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -35,13 +38,45 @@ const SignUp = () => {
     const form = e.target;
     const firstName = form.f_name.value;
     const lastName = form.l_name.value;
+    const fullName = firstName + " " + lastName;
     const profilePicture = form.profile_pic.files[0];
+    const email = form.email.value;
     const password = form.password.value;
+    const passwordConfimation = password === confirmPass;
 
-    if (password !== confirmPass) {
-      setErrorMessage("Passwords do not match");
-      return;
+    if (!passwordConfimation) {
+      return setErrorMessage("Password doesn't match");
     }
+    if (!/^(.{6,})$/.test(password)) {
+      return setErrorMessage("Password must be at least 6 characters");
+    }
+    if (!/[A-Z]/.test(password)) {
+      return setErrorMessage(
+        "Password must contain at least one capital letter"
+      );
+    }
+    if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/.test(password)) {
+      return setErrorMessage(
+        "Password must contain at least one special character"
+      );
+    }
+
+    signUpUser(email, password)
+      .then(async () => {
+        let profile_pic_url;
+        if (profilePicture) {
+          const imageUpload = await uploadImageImgBB(profilePicture);
+          const profile_picture = imageUpload?.data?.display_url
+            ? imageUpload.data.display_url
+            : null; // /assets/icons/user.png
+          profile_pic_url = profile_picture;
+        }
+
+        console.log(profile_pic_url);
+
+        await updateUserProfile(fullName, profile_pic_url);
+      })
+      .catch((error) => setErrorMessage("Your email is already in use"));
   };
 
   const handleImage = (e) => {
@@ -61,17 +96,6 @@ const SignUp = () => {
     }
   };
 
-  const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
-  });
   return (
     <>
       <DomHead title="Sign Up" />
@@ -127,10 +151,11 @@ const SignUp = () => {
                   component="label"
                   variant="contained"
                   startIcon={<FaCloudUploadAlt />}
-                  className="!normal-case w-full"
+                  className="!normal-case w-full relative"
                 >
                   Upload Profile Picture
-                  <VisuallyHiddenInput
+                  <input
+                    className="absolute w-full h-full opacity-0"
                     id="profile_pic"
                     type="file"
                     onChangeCapture={handleImage}

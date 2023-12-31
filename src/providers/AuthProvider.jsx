@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import app from "../firebase/firebase.config";
 import PropTypes from "prop-types";
@@ -55,6 +56,18 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
+  const updateUserProfile = (name, photo) => {
+    const profileData = {
+      displayName: name,
+    };
+
+    if (photo !== null) {
+      profileData.photoURL = photo;
+    }
+
+    return updateProfile(auth.currentUser, profileData);
+  };
+
   const continueWithGoogle = async () => {
     setUserLoading(true);
     return signInWithPopup(auth, google_provider);
@@ -79,6 +92,7 @@ const AuthProvider = ({ children }) => {
     continueWithGoogle,
     continueWithFacebook,
     continueWithTwitter,
+    updateUserProfile,
   };
 
   return (
