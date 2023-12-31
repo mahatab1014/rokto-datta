@@ -14,8 +14,11 @@ import DomHead from "../../components/shared/DomHead/DomHead";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import useAuth from "../../hooks/useAuth";
 
 const SignIn = () => {
+  const { signInUser } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const handleTogglePasswordVisibility = () => {
@@ -25,8 +28,9 @@ const SignIn = () => {
     e.preventDefault();
     setErrorMessage("");
     const form = e.target;
-    const email = form.emai.value;
+    const email = form.email.value;
     const password = form.password.value;
+    signInUser(email, password);
   };
 
   return (
@@ -54,7 +58,7 @@ const SignIn = () => {
                 <TextField
                   type="email"
                   className="w-full"
-                  id="filled-basic"
+                  id="sign-in-email"
                   label="E-mail"
                   name="email"
                   variant="filled"
@@ -63,7 +67,7 @@ const SignIn = () => {
                 <TextField
                   type={showPassword ? "text" : "password"}
                   className="w-full"
-                  id="filled-basic"
+                  id="sign-in-password"
                   label="Password"
                   name="password"
                   variant="filled"
