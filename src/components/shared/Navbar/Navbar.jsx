@@ -3,9 +3,12 @@ import LogoBangla from "../../../assets/images/logo/rokto-datta-ban.png";
 import { useState } from "react";
 import Container from "../../ui/Container/Container";
 import { Avatar, Button } from "@mui/material";
+import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
+  const { user, signOutUser } = useAuth();
   const [isChecked, setIsChecked] = useState(false);
+
   const handleInputChange = () => {
     // Update the state when the input changes
     setIsChecked(!isChecked);
@@ -54,7 +57,7 @@ const Navbar = () => {
                   />
                 </Link>
               </div>
-              <div className="flex-none hidden lg:block">
+              <div className="flex-none hidden lg:flex lg:items-center">
                 <ul className="menu menu-horizontal py-0">
                   {menuLinks.map((menu, index) => (
                     <li key={index}>
@@ -77,106 +80,117 @@ const Navbar = () => {
                       </NavLink>
                     </li>
                   ))}
-                  <li >
-                    <NavLink
-                      to="/sign-in"
-                      className={({ isActive, isPending }) =>
-                        isPending
-                          ? "pending"
-                          : isActive
-                          ? "nav-link-style-remove [&>button]:!font-bold"
-                          : "nav-link-style-remove"
-                      }
-                    >
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal"
+
+                  {!user && (
+                    <li>
+                      <NavLink
+                        to="/sign-in"
+                        className={({ isActive, isPending }) =>
+                          isPending
+                            ? "pending"
+                            : isActive
+                            ? "nav-link-style-remove [&>button]:!font-bold"
+                            : "nav-link-style-remove"
+                        }
                       >
-                        Sign In
-                      </Button>
-                    </NavLink>
-                  </li>
+                        <Button
+                          variant="text"
+                          className="!text-neutral !font-normal"
+                        >
+                          Sign In
+                        </Button>
+                      </NavLink>
+                    </li>
+                  )}
                 </ul>
 
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="">
-                    <Avatar
-                      alt="Remy Sharp"
-                      src="/static/images/avatar/1.jpg"
-                    />
+                {user && (
+                  <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="">
+                      <Avatar
+                        sx={{ width: 35, height: 35 }}
+                        alt={user?.displayName}
+                        src={user?.photoURL}
+                      />
+                    </div>
+                    <ul
+                      tabIndex={0}
+                      className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-40 [&>li>button]:!normal-case [&>li>button]:!font-semibold"
+                    >
+                      <li>
+                        <Button
+                          variant="text"
+                          className="!text-neutral !font-normal active:!bg-white"
+                        >
+                          Profile
+                        </Button>
+                      </li>
+                      <li>
+                        <Button
+                          variant="text"
+                          className="!text-neutral !font-normal active:!bg-white"
+                        >
+                          Settings
+                        </Button>
+                      </li>
+                      <li>
+                        <Button
+                          onClick={() => signOutUser()}
+                          variant="text"
+                          className="!text-neutral !font-normal active:!bg-white"
+                        >
+                          Logout
+                        </Button>
+                      </li>
+                    </ul>
                   </div>
-                  <ul
-                    tabIndex={0}
-                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-40 [&>li>button]:!normal-case [&>li>button]:!font-semibold"
-                  >
-                    <li>
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal active:!bg-white"
-                      >
-                        Profile
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal active:!bg-white"
-                      >
-                        Settings
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal active:!bg-white"
-                      >
-                        Logout
-                      </Button>
-                    </li>
-                  </ul>
-                </div>
+                )}
               </div>
 
               <div className="flex-none lg:hidden">
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="">
-                    <Avatar
-                      sx={{ width: 30, height: 30 }}
-                      alt="Remy Sharp"
-                      src="/static/images/avatar/1.jpg"
-                    />
+                {user && (
+                  <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="">
+                      <Avatar
+                        sx={{ width: 30, height: 30 }}
+                        alt={user?.displayName}
+                        src={user?.photoURL}
+                      />
+                    </div>
+                    <ul
+                      tabIndex={0}
+                      className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-32"
+                    >
+                      <li>
+                        <Button
+                          variant="text"
+                          className="!text-neutral !font-normal active:!bg-white"
+                        >
+                          Profile
+                        </Button>
+                      </li>
+                      <li>
+                        <Button
+                          variant="text"
+                          className="!text-neutral !font-normal active:!bg-white"
+                        >
+                          Settings
+                        </Button>
+                      </li>
+                      <li>
+                        <Button
+                          onClick={() => signOutUser()}
+                          variant="text"
+                          className="!text-neutral !font-normal active:!bg-white"
+                        >
+                          Logout
+                        </Button>
+                      </li>
+                    </ul>
                   </div>
-                  <ul
-                    tabIndex={0}
-                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-                  >
-                    <li>
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal active:!bg-white"
-                      >
-                        Profile
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal active:!bg-white"
-                      >
-                        Settings
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        variant="text"
-                        className="!text-neutral !font-normal active:!bg-white"
-                      >
-                        Logout
-                      </Button>
-                    </li>
-                  </ul>
-                </div>
-                <div className="pl-8">
+                )}
+
+                <div className="pl-5">
                   <svg
                     onClick={handleInputChange}
                     className={`fill-current ${isChecked === true && "hidden"}`}
@@ -227,6 +241,11 @@ const Navbar = () => {
                   <NavLink to={menu?.path}>{menu.name}</NavLink>
                 </li>
               ))}
+              {!user && (
+                <li>
+                  <NavLink to="/sign-in">Sign In</NavLink>
+                </li>
+              )}
             </ul>
           </div>
         </div>

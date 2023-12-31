@@ -25,21 +25,28 @@ const AuthProvider = ({ children }) => {
   const twitter_provider = new TwitterAuthProvider();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (loggedUser) => {
-      if (loggedUser) {
-        setUser(loggedUser);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const userEmail = currentUser?.email || user?.email;
+      const loggedUser = { email: userEmail };
+      setUser(currentUser);
 
-        console.log(loggedUser);
-        // const uid = loggedUser.uid;
-        // ...
-      }
+      //   if (currentUser) {
+      //     axiosPublic.post("/jwt", loggedUser, {
+      //       withCredentials: true,
+      //     });
+      //   } else {
+      //     axiosPublic.post("/logout", loggedUser, {
+      //       withCredentials: true,
+      //     });
+      //   }
 
+      console.log(currentUser);
       setUserLoading(false);
     });
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [user?.email]);
 
   const signUpUser = async (email, password) => {
     setUserLoading(true);
@@ -51,12 +58,13 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signOutUser = async (auth) => {
+  const signOutUser = () => {
     setUserLoading(true);
     return signOut(auth);
   };
 
   const updateUserProfile = (name, photo) => {
+    setUserLoading(true);
     const profileData = {
       displayName: name,
     };
