@@ -5,15 +5,18 @@ import { RouterProvider } from "react-router-dom";
 import PublicRoutes from "./routers/PublicRoutes";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AuthProvider from "./providers/AuthProvider";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("app")).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <RouterProvider router={PublicRoutes} />
-      </HelmetProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <RouterProvider router={PublicRoutes} />
+        </HelmetProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
