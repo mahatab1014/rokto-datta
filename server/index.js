@@ -8,11 +8,16 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 
 // CORS Middleware
-const corsOptions = {
-  origin: ["*"],
+const allowedOrigins = {
+  origin: ["*", "http://localhost:5173/"],
   optionsSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // MongoDB Configuration
@@ -29,7 +34,11 @@ async function run() {
     const database = client.db("RoktoDatta_DB");
     const postCollection = database.collection("donation_posts");
 
-
+    app.post("/api/v1/create-post", async (req, res) => {
+      const data = req.body;
+      console.log(data);
+      res.json({ message: "Received data on the server!" });
+    });
 
     await client.connect();
     await client.db("admin").command({ ping: 1 });
