@@ -34,7 +34,6 @@ async function run() {
     const database = client.db("RoktoDatta_DB");
     const postCollection = database.collection("donation_posts");
 
-
     // Donation Post CRUD Operations
     app.post("/api/v1/posts", async (req, res) => {
       const data = req.body;
@@ -42,14 +41,45 @@ async function run() {
       res.send(result).status(200);
     });
     app.get("/api/v1/posts", async (req, res) => {
+      const { postType } = req.query;
+
       try {
-        const posts = await postCollection.find().toArray();
-        const resultData = {
-          status: 200,
-          message: "ok",
-          data: posts,
-        };
-        res.status(200).send(resultData);
+        if (postType === "recent") {
+          const filter = { post_type: postType };
+          const recentPosts = await postCollection.find(filter).toArray();
+          const resultData = {
+            status: 200,
+            message: "ok",
+            data: recentPosts,
+          };
+          res.status(200).send(resultData);
+        } else if (postType === "urgent") {
+          const filter = { post_type: postType };
+          const urgentPosts = await postCollection.find(filter).toArray();
+          const resultData = {
+            status: 200,
+            message: "ok",
+            data: urgentPosts,
+          };
+          res.status(200).send(resultData);
+        } else if (postType === "event") {
+          const filter = { post_type: postType };
+          const eventPosts = await postCollection.find(filter).toArray();
+          const resultData = {
+            status: 200,
+            message: "ok",
+            data: eventPosts,
+          };
+          res.status(200).send(resultData);
+        } else {
+          const posts = await postCollection.find().toArray();
+          const resultData = {
+            status: 200,
+            message: "ok",
+            data: posts,
+          };
+          res.status(200).send(resultData);
+        }
       } catch (err) {
         const resultData = {
           status: 500,
