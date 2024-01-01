@@ -6,13 +6,13 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { MdOutlineLocationCity } from "react-icons/md";
 
 const PostCard = ({ postData }) => {
-  console.log(postData);
+
   return (
     <article className="card card-compact lg:card-side bg-base-100 border rounded">
       <figure className="lg:w-5/12 min-h-44 max-h-72">
         <img
           className="w-full h-full object-cover"
-          src={postData?.cover_img}
+          src={postData?.image_info?.md_image_url}
           alt={postData?.title}
         />
       </figure>

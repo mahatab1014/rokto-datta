@@ -1,18 +1,19 @@
 import DomHead from "../../components/shared/DomHead/DomHead";
 import CreatePost from "../../components/ui/CreatePost/CreatePost";
 import PostCard from "../../components/ui/PostCard/PostCard";
-import { useEffect, useState } from "react";
 import HomeRightMenu from "../../components/shared/HomeRightMenu/HomeRightMenu";
 import Container from "../../components/ui/Container/Container";
+import usePostsData from "../../hooks/usePostsData";
+import Skeleton from "react-loading-skeleton";
+import { Button } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 
 const Home = () => {
-  const [data, setData] = useState([]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const postTypeParam = queryParams.get("postType");
 
-  useEffect(() => {
-    fetch("/fake-post-data.json")
-      .then((post) => post.json())
-      .then((postData) => setData(postData));
-  }, []);
+  const { postsData, postsDataRefetch, postsDataLoading } = usePostsData(postTypeParam);
 
   return (
     <>
@@ -27,9 +28,65 @@ const Home = () => {
               <CreatePost />
 
               <div className="space-y-3 !bg-transparent [&>div]:bg-base-100">
-                {data.map((postData, index) => (
-                  <PostCard key={index} postData={postData} />
-                ))}
+                {postsDataLoading ? (
+                  <>
+                    {[1, 2, 3].map((skeleton3Times) => (
+                      <article
+                        key={skeleton3Times}
+                        className="card card-compact lg:card-side bg-base-100 border rounded"
+                      >
+                        <div className="lg:w-5/12 -mt-1">
+                          <Skeleton className="w-full !h-[98%] !rounded" />
+                        </div>
+                        <div className="lg:w-7/12 card-body">
+                          <div className="">
+                            <Skeleton className="!w-11/12 h-6" />
+                          </div>
+                          <p>
+                            <Skeleton className="!w-10/12" />
+                            <Skeleton className="!w-12/12" />
+                            <Skeleton className="!w-11/12" />
+                          </p>
+                          <div className="">
+                            <Skeleton className="!w-4/12 h-2.5" />
+                            <Skeleton className="!w-5/12 h-2.5" />
+                            <Skeleton className="!w-3/12 h-2.5" />
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {postsData?.status === 200 ? (
+                      <>
+                        {postsData?.data?.map((postData) => (
+                          <PostCard key={postData._id} postData={postData} />
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        <div className="py-10 text-center space-y-5">
+                          <h2 className="text-2xl font-semibold">
+                            Something went wrong!
+                          </h2>
+                          <p className="text-lg pb-5">No data found</p>
+                          <div className="space-x-3">
+                            <Button
+                              variant="contained"
+                              onClick={() => window.location.reload()}
+                            >
+                              Refresh
+                            </Button>
+                            <Link to="/contact-us">
+                              <Button variant="outlined">Contact us</Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </section>
           </div>
