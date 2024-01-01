@@ -2,11 +2,11 @@ import { Button } from "@mui/material";
 import PropTypes from "prop-types";
 import { RxCalendar } from "react-icons/rx";
 import { HiOutlineLocationMarker } from "react-icons/hi";
+import moment from "moment";
 
 import { MdOutlineLocationCity } from "react-icons/md";
 
 const PostCard = ({ postData }) => {
-
   return (
     <article className="card card-compact lg:card-side bg-base-100 border rounded">
       <figure className="lg:w-5/12 min-h-44 max-h-72">
@@ -31,7 +31,11 @@ const PostCard = ({ postData }) => {
         <div className="text-gray-600 [&>div>span]:text-xs [&>div>span]:font-semibold">
           <div className="flex items-center gap-3">
             <RxCalendar className="text-lg" />
-            <span>02-01-2024 | 10:00 am</span>
+            <span>
+              {moment(postData?.blood_need_deadline).format(
+                "DD-MM-YYYY | h:mm a"
+              )}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             <MdOutlineLocationCity className="text-lg" />
