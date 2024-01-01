@@ -8,14 +8,16 @@ import useDistricts from "../../../hooks/useDistricts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useAuth from "../../../hooks/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { uploadImageImgBB } from "../../../utility/utility";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 const CreatePost = () => {
   const { user, userLoading } = useAuth();
 
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
   const [posting, setPosting] = useState(false);
   const [selectedDivision, setSelectedDivision] = useState("");
@@ -65,7 +67,7 @@ const CreatePost = () => {
     const district_name = form.district_data.value;
     const upazilla_name = form.upazilla_data.value;
 
-    const imageUpload = {}; //await uploadImageImgBB(image);
+    const imageUpload = await uploadImageImgBB(image);
     const imgData = imageUpload?.data;
     // console.log(imgData);
 
@@ -100,8 +102,26 @@ const CreatePost = () => {
       comment_count: 0,
     };
 
-    const red = await axiosSecure("/create-post", data);
-    console.log(red);
+    const postData = await axiosSecure.post("/posts", data);
+    if (postData?.data?.insertedId.length > 0) {
+      setPosting(false);
+      document.getElementById("post_modal_show").close();
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Your post has been published",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        navigate("/?postType=recent");
+        setSelectedDivision("");
+        setSelectedDistrict("");
+        setUpazilas("");
+        setSelectedDate("");
+        setSelectedImage("");
+        form.reset();
+      });
+    }
   };
 
   const handleImage = (e) => {
@@ -127,8 +147,8 @@ const CreatePost = () => {
         <div className="flex gap-5">
           <figure className="">
             <Avatar
-              alt="Remy Sharp"
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+              alt={user?.displayName}
+              src={user?.photoURL}
             />
           </figure>
           <div
