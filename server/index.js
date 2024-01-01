@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 // CORS Middleware
@@ -34,6 +34,8 @@ async function run() {
     const database = client.db("RoktoDatta_DB");
     const postCollection = database.collection("donation_posts");
 
+
+    // Donation Post CRUD Operations
     app.post("/api/v1/posts", async (req, res) => {
       const data = req.body;
       const result = await postCollection.insertOne(data);
@@ -55,6 +57,134 @@ async function run() {
           data: [],
         };
         res.status(500).send(resultData);
+      }
+    });
+    app.get("/api/v1/post/:id", async (req, res) => {
+      const { id } = req.params;
+
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({
+          status: 400,
+          message: "Invalid ObjectId",
+        });
+      }
+
+      try {
+        const filter = { _id: new ObjectId(id) };
+        const result = await postCollection.findOne(filter);
+
+        if (!result) {
+          // If no post is found with the given ID
+          res.status(404).send({
+            status: 404,
+            message: "Post not found",
+            data: null,
+          });
+        } else {
+          // If the post is found
+          res.status(200).send({
+            status: 200,
+            message: "OK",
+            data: result,
+          });
+        }
+      } catch (err) {
+        // If there's an error in processing the request
+        res.status(500).send({
+          status: 500,
+          message: err.message,
+          data: null,
+        });
+      }
+    });
+    app.patch("/api/v1/post/:id", async (req, res) => {
+      const { id } = req.params;
+
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({
+          status: 400,
+          message: "Invalid ObjectId",
+        });
+      }
+
+      const dataToUpdate = req.body;
+      const filter = { _id: new ObjectId(id) };
+
+      try {
+        const updatedData = {};
+
+        Object.keys(dataToUpdate).forEach((key) => {
+          if (key === "image_info" && typeof dataToUpdate[key] === "object") {
+            updatedData[key] = {
+              image_url: dataToUpdate[key].image_url,
+              md_image_url: dataToUpdate[key].md_image_url,
+              image_delete_url: dataToUpdate[key].image_delete_url,
+            };
+          } else if (dataToUpdate[key]) {
+            updatedData[key] = dataToUpdate[key];
+          }
+        });
+
+        const result = await postCollection.findOneAndUpdate(
+          filter,
+          { $set: updatedData },
+          {
+            returnDocument: "after",
+          }
+        );
+
+        // Handle the result
+        if (result) {
+          res.status(200).send({
+            status: 200,
+            message: "Post updated successfully",
+          });
+        } else {
+          res.status(404).send({
+            status: 404,
+            message: "Post not found",
+          });
+        }
+      } catch (error) {
+        // Handle errors
+        console.error(error);
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
+    app.delete("/api/v1/posts", async (req, res) => {
+      const { id } = req.query;
+
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({
+          status: 400,
+          message: "Invalid ObjectId",
+        });
+      }
+
+      try {
+        const filter = { _id: new ObjectId(id) };
+        const deletePost = await postCollection.deleteOne(filter);
+
+        if (deletePost.deletedCount > 0) {
+          res.status(200).send({
+            status: 200,
+            message: "Post deleted successfully",
+          });
+        } else {
+          res.status(404).send({
+            status: 404,
+            message: "Post not found",
+          });
+        }
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+        });
       }
     });
 
