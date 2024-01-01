@@ -34,10 +34,28 @@ async function run() {
     const database = client.db("RoktoDatta_DB");
     const postCollection = database.collection("donation_posts");
 
-    app.post("/api/v1/create-post", async (req, res) => {
+    app.post("/api/v1/posts", async (req, res) => {
       const data = req.body;
       const result = await postCollection.insertOne(data);
       res.send(result).status(200);
+    });
+    app.get("/api/v1/posts", async (req, res) => {
+      try {
+        const posts = await postCollection.find().toArray();
+        const resultData = {
+          status: 200,
+          message: "ok",
+          data: posts,
+        };
+        res.status(200).send(resultData);
+      } catch (err) {
+        const resultData = {
+          status: 500,
+          message: err.message,
+          data: [],
+        };
+        res.status(500).send(resultData);
+      }
     });
 
     await client.connect();
