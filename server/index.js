@@ -36,8 +36,8 @@ async function run() {
 
     app.post("/api/v1/create-post", async (req, res) => {
       const data = req.body;
-      console.log(data);
-      res.json({ message: "Received data on the server!" });
+      const result = await postCollection.insertOne(data);
+      res.send(result).status(200);
     });
 
     await client.connect();
