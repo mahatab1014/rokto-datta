@@ -13,7 +13,10 @@ const PostCard = ({ postData }) => {
       <figure className="lg:w-5/12 min-h-44 max-h-72">
         <img
           className="w-full h-full object-cover"
-          src={postData?.image_info?.md_image_url}
+          src={
+            postData?.image_info?.md_image_url ||
+            postData?.image_info?.image_url
+          }
           alt={postData?.title}
         />
       </figure>

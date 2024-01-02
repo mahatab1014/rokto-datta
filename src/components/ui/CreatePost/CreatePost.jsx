@@ -12,14 +12,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { uploadImageImgBB } from "../../../utility/utility";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
+import usePostsData from "../../../hooks/usePostsData";
 
 const CreatePost = () => {
   const { user, userLoading } = useAuth();
 
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
+  const { postsDataRefetch } = usePostsData();
 
   const [posting, setPosting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState("");
   const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [upazilas, setUpazilas] = useState([]);
@@ -54,6 +58,7 @@ const CreatePost = () => {
   const handlePost = async (e) => {
     e.preventDefault();
     setPosting(true);
+    setErrorMessage("");
     const form = e.target;
     const image = form.image.files[0];
     const title = form.title.value;
@@ -66,6 +71,11 @@ const CreatePost = () => {
     const division_name = form.division_data.value;
     const district_name = form.district_data.value;
     const upazilla_name = form.upazilla_data.value;
+
+    if (!image) {
+      setErrorMessage("Please provide a image");
+      return setPosting(false);
+    }
 
     const imageUpload = await uploadImageImgBB(image);
     const imgData = imageUpload?.data;
@@ -113,7 +123,8 @@ const CreatePost = () => {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        navigate("/?postType=recent");
+        navigate(`/post/${postData?.data?.insertedId}`);
+        postsDataRefetch();
         setSelectedDivision("");
         setSelectedDistrict("");
         setUpazilas("");
@@ -146,10 +157,7 @@ const CreatePost = () => {
       <div className="p-3 sm:p-6 bg-base-100 border rounded">
         <div className="flex gap-5">
           <figure className="">
-            <Avatar
-              alt={user?.displayName}
-              src={user?.photoURL}
-            />
+            <Avatar alt={user?.displayName} src={user?.photoURL} />
           </figure>
           <div
             onClick={() =>
@@ -195,6 +203,12 @@ const CreatePost = () => {
               <h3 className="font-bold text-lg border-b-2 mb-3">Create Post</h3>
               <div>
                 <form className="space-y-2 label-style" onSubmit={handlePost}>
+                  {errorMessage && (
+                    <div className="bg-error font-semibold text-center rounded text-white">
+                      {errorMessage}
+                    </div>
+                  )}
+
                   {selectedImage && (
                     <div className="flex py-3 justify-center">
                       <div className="w-40 rounded-full">
@@ -247,6 +261,7 @@ const CreatePost = () => {
                         id="blood_group"
                         name="blood_group"
                         className="post-form-field"
+                        disabled={selectedEvent === "event"}
                         required
                       >
                         <option disabled selected>
@@ -268,6 +283,7 @@ const CreatePost = () => {
                         id="post_type"
                         name="post_type"
                         className="post-form-field"
+                        onChange={(e) => setSelectedEvent(e.target.value)}
                         required
                       >
                         <option selected>None</option>

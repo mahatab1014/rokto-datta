@@ -5,7 +5,6 @@ const DomHead = ({
   title,
   metaDescription,
   metaImageURL,
-  metaPageURL,
   metaKeywords,
   metaAuthorName,
 }) => {
@@ -17,7 +16,7 @@ const DomHead = ({
         <meta property="og:title" content={title} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:image" content={metaImageURL} />
-        <meta property="og:url" content={metaPageURL} />
+        <meta property="og:url" content={window.location.href} />
 
         <meta name="keywords" content={metaKeywords} />
         <meta name="author" content={metaAuthorName} />

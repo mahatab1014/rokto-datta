@@ -13,7 +13,8 @@ const Home = () => {
   const queryParams = new URLSearchParams(location.search);
   const postTypeParam = queryParams.get("postType");
 
-  const { postsData, postsDataRefetch, postsDataLoading } = usePostsData(postTypeParam);
+  const { postsData, postsDataLoading } =
+    usePostsData(postTypeParam);
 
   return (
     <>
@@ -58,7 +59,8 @@ const Home = () => {
                   </>
                 ) : (
                   <>
-                    {postsData?.status === 200 ? (
+                    {postsData?.status === 200 &&
+                    postsData?.data.length !== 0 ? (
                       <>
                         {postsData?.data?.map((postData) => (
                           <PostCard key={postData._id} postData={postData} />
@@ -66,7 +68,7 @@ const Home = () => {
                       </>
                     ) : (
                       <>
-                        <div className="py-10 text-center space-y-5">
+                        <div className="py-10 text-center space-y-5 border rounded">
                           <h2 className="text-2xl font-semibold">
                             Something went wrong!
                           </h2>

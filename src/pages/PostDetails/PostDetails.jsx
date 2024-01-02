@@ -11,6 +11,7 @@ import { TbUrgent } from "react-icons/tb";
 import { Avatar } from "@mui/material";
 import DomHead from "../../components/shared/DomHead/DomHead";
 import Skeleton from "react-loading-skeleton";
+import React from "react";
 
 const PostDetails = () => {
   const { id } = useParams();
@@ -176,7 +177,12 @@ const PostDetails = () => {
                       {data?.title}
                     </h1>
                     <p className="text-lg font-medium text-gray-700">
-                      {data?.description}
+                      {data?.description?.split("\n").map((line, i) => (
+                        <React.Fragment key={i}>
+                          <>{line}</>
+                          <br />
+                        </React.Fragment>
+                      ))}
                     </p>
                   </div>
                 </article>
