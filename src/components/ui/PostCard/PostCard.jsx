@@ -5,6 +5,7 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import moment from "moment";
 
 import { MdOutlineLocationCity } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const PostCard = ({ postData }) => {
   return (
@@ -47,7 +48,9 @@ const PostCard = ({ postData }) => {
           </div>
         </div>
         <div>
-          <Button variant="outlined">Details</Button>
+          <Link to={`/post/${postData?._id}`}>
+            <Button variant="outlined">Details</Button>
+          </Link>
         </div>
       </div>
     </article>

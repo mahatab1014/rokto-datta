@@ -1,33 +1,38 @@
 import { createBrowserRouter } from "react-router-dom";
-import RootLayot from "../layouts/RootLayot";
+import RootLayout from "../layouts/RootLayout";
 import Home from "../pages/Home/Home";
 import SignUp from "../pages/Auth/SignUp";
 import SignIn from "../pages/Auth/SignIn";
+import PostDetails from "../pages/PostDetails/PostDetails";
 
 const PublicRoutes = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayot />,
+    element: <RootLayout />,
     children: [
       {
         index: true,
         element: <Home />,
       },
       {
+        path: "post/:id",
+        element: <PostDetails />,
+      },
+      {
         path: "blood-donors",
       },
       {
-        path: "contact",
+        path: "contact-us",
       },
       {
-        path: "/dashboard",
+        path: "dashboard",
       },
       {
-        path: "/sign-up",
+        path: "sign-up",
         element: <SignUp />,
       },
       {
-        path: "/sign-in",
+        path: "sign-in",
         element: <SignIn />,
       },
     ],

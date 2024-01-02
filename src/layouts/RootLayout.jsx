@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/shared/Navbar/Navbar";
 
-const RootLayot = () => {
+const RootLayout = () => {
   return (
     <>
       <header className="bg-white border sticky top-0 z-50">
@@ -17,4 +17,4 @@ const RootLayot = () => {
   );
 };
 
-export default RootLayot;
+export default RootLayout;
