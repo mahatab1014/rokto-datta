@@ -3,6 +3,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const moment = require("moment-timezone");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
@@ -44,9 +45,13 @@ async function run() {
       const { postType } = req.query;
 
       try {
+        const currentTime = moment().toISOString();
         if (postType === "recent") {
-          const filter = { post_type: postType };
-          const recentPosts = await postCollection.find(filter).toArray();
+          const data_sort = { posted_at: -1 };
+          const recentPosts = await postCollection
+            .find()
+            .sort(data_sort)
+            .toArray();
           const resultData = {
             status: 200,
             message: "ok",
@@ -54,8 +59,19 @@ async function run() {
           };
           res.status(200).send(resultData);
         } else if (postType === "urgent") {
-          const filter = { post_type: postType };
-          const urgentPosts = await postCollection.find(filter).toArray();
+          // filter post type and remove deadline expired posts
+          const filter = {
+            post_type: postType,
+            blood_need_deadline: { $gte: currentTime },
+          };
+          // sort recent urgent post
+          const recentUrgentPost = {
+            posted_at: -1,
+          };
+          const urgentPosts = await postCollection
+            .find(filter)
+            .sort(recentUrgentPost)
+            .toArray();
           const resultData = {
             status: 200,
             message: "ok",
@@ -63,7 +79,10 @@ async function run() {
           };
           res.status(200).send(resultData);
         } else if (postType === "event") {
-          const filter = { post_type: postType };
+          const filter = {
+            post_type: postType,
+            blood_need_deadline: { $gte: currentTime },
+          };
           const eventPosts = await postCollection.find(filter).toArray();
           const resultData = {
             status: 200,
