@@ -42,7 +42,10 @@ async function run() {
       res.send(result).status(200);
     });
     app.get("/api/v1/posts", async (req, res) => {
-      const { postType } = req.query;
+      const { postType, page, size } = req.query;
+
+      const pageNumber = parseInt(page) || 0;
+      const sizeNumber = parseInt(size) || 10;
 
       try {
         const currentTime = moment().toISOString();
@@ -91,7 +94,13 @@ async function run() {
           };
           res.status(200).send(resultData);
         } else {
-          const posts = await postCollection.find().toArray();
+          const skip = pageNumber * sizeNumber;
+          const limit = sizeNumber;
+          const posts = await postCollection
+            .find()
+            .skip(skip)
+            .limit(limit)
+            .toArray();
           const resultData = {
             status: 200,
             message: "ok",
@@ -234,6 +243,24 @@ async function run() {
           status: 500,
           message: error.message,
         });
+      }
+    });
+    app.get("/api/v1/posts-count", async (req, res) => {
+      try {
+        const count = await postCollection.estimatedDocumentCount();
+        const resultData = {
+          status: 200,
+          message: "ok",
+          count: count,
+        };
+        res.status(200).send(resultData);
+      } catch (error) {
+        const resultData = {
+          status: 500,
+          message: error.message,
+          data: null,
+        };
+        res.status(500).send(resultData);
       }
     });
 

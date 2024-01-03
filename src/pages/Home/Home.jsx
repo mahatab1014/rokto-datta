@@ -7,14 +7,26 @@ import usePostsData from "../../hooks/usePostsData";
 import Skeleton from "react-loading-skeleton";
 import { Button } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
+import PaginationButton from "../../components/ui/PaginationButton/PaginationButton";
+import { useState } from "react";
+import usePostsCount from "../../hooks/usePostsCount";
 
 const Home = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postTypeParam = queryParams.get("postType");
 
-  const { postsData, postsDataLoading } =
-    usePostsData(postTypeParam);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const { postsData, postsDataLoading } = usePostsData(
+    postTypeParam,
+    page,
+    rowsPerPage
+  );
+  const { postsCountData } = usePostsCount();
+
+  const totalPosts = postsCountData?.count;
 
   return (
     <>
@@ -89,6 +101,14 @@ const Home = () => {
                     )}
                   </>
                 )}
+
+                <PaginationButton
+                  page={page}
+                  setPage={setPage}
+                  rowsPerPage={rowsPerPage}
+                  setRowsPerPage={setRowsPerPage}
+                  totalPosts={totalPosts}
+                />
               </div>
             </section>
           </div>
