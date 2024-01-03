@@ -4,6 +4,7 @@ import Home from "../pages/Home/Home";
 import SignUp from "../pages/Auth/SignUp";
 import SignIn from "../pages/Auth/SignIn";
 import PostDetails from "../pages/PostDetails/PostDetails";
+import BloodDonors from "../pages/BloodDonors/BloodDonors";
 
 const PublicRoutes = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const PublicRoutes = createBrowserRouter([
       },
       {
         path: "blood-donors",
+        element: <BloodDonors />,
       },
       {
         path: "contact-us",
