@@ -5,6 +5,8 @@ import SignUp from "../pages/Auth/SignUp";
 import SignIn from "../pages/Auth/SignIn";
 import PostDetails from "../pages/PostDetails/PostDetails";
 import BloodDonors from "../pages/BloodDonors/BloodDonors";
+import DashboardLayout from "../layouts/DashboardLayout";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 const PublicRoutes = createBrowserRouter([
   {
@@ -28,6 +30,13 @@ const PublicRoutes = createBrowserRouter([
       },
       {
         path: "dashboard",
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <Dashboard />,
+          },
+        ],
       },
       {
         path: "sign-up",
