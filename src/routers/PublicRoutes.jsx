@@ -36,6 +36,15 @@ const PublicRoutes = createBrowserRouter([
             index: true,
             element: <Dashboard />,
           },
+          {
+            path: "all-posts",
+          },
+          {
+            path: "donations-history",
+          },
+          {
+            path: "profile",
+          },
         ],
       },
       {
