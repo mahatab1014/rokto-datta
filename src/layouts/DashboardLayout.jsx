@@ -6,7 +6,7 @@ const DashboardLayout = () => {
     <>
       <div className="flex">
         <DashboardNav />
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" className="p-3 md:p-4 lg:p-6" sx={{ flexGrow: 1,}}>
           <Outlet />
         </Box>
       </div>
