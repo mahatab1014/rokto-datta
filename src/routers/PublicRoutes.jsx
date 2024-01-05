@@ -7,6 +7,9 @@ import PostDetails from "../pages/PostDetails/PostDetails";
 import BloodDonors from "../pages/BloodDonors/BloodDonors";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Dashboard from "../pages/Dashboard/Dashboard";
+import AllPosts from "../pages/Dashboard/AllPosts/AllPosts";
+import DonationsHistory from "../pages/Dashboard/DonationsHistory/DonationsHistory";
+import Profile from "../pages/Dashboard/Profile/Profile";
 
 const PublicRoutes = createBrowserRouter([
   {
@@ -38,12 +41,15 @@ const PublicRoutes = createBrowserRouter([
           },
           {
             path: "all-posts",
+            element: <AllPosts />,
           },
           {
             path: "donations-history",
+            element: <DonationsHistory />,
           },
           {
             path: "profile",
+            element: <Profile />,
           },
         ],
       },
