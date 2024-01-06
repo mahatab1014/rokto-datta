@@ -34,6 +34,7 @@ async function run() {
   try {
     const database = client.db("RoktoDatta_DB");
     const postCollection = database.collection("donation_posts");
+    const commentsCollection = database.collection("donation_comments");
 
     // Donation Post CRUD Operations
     app.post("/api/v1/posts", async (req, res) => {
@@ -259,6 +260,36 @@ async function run() {
           status: 500,
           message: error.message,
           data: null,
+        };
+        res.status(500).send(resultData);
+      }
+    });
+
+    // Comments
+    app.post("/api/v1/comments", async (req, res) => {
+      const data = req.body;
+      const result = await commentsCollection.insertOne(data);
+      res.status(200).send(result);
+    });
+    app.get("/api/v1/comments/:id", async (req, res) => {
+      const { id } = req.params;
+      try {
+        const filter = { post_id: id };
+        const getComments = await commentsCollection
+          .find(filter)
+          .sort({ published_at: -1 })
+          .toArray();
+        const resultData = {
+          status: 200,
+          message: "ok",
+          data: getComments,
+        };
+        res.status(200).send(resultData);
+      } catch (error) {
+        const resultData = {
+          status: 500,
+          message: error.message,
+          data: [],
         };
         res.status(500).send(resultData);
       }

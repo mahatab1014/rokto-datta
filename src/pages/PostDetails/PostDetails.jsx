@@ -11,37 +11,42 @@ import { TbUrgent } from "react-icons/tb";
 import { Avatar, Button } from "@mui/material";
 import DomHead from "../../components/shared/DomHead/DomHead";
 import Skeleton from "react-loading-skeleton";
-import React from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useCommentsData from "../../hooks/useCommentsData";
 
 const PostDetails = () => {
   const { id } = useParams();
 
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const { commentsData, commentsDataRefetch } = useCommentsData(id);
 
   const { singlePostData, singlePostDataLoading } = useSinglePostData(id);
-
+  const [commentPosting, setCommentPosting] = useState(false);
   const data = singlePostData?.data;
 
-  // TIME ZONE
-  const postedTimeUTC = moment.utc(data?.posted_at);
-  // Get the user's time zone (you may need to get this information from the user somehow)
-  const userTimeZone = moment.tz.guess();
-  // Convert the posted time to the user's time zone
-  const postedTimeUserTZ = postedTimeUTC.tz(userTimeZone);
-  // Calculate the duration
-  const duration = moment.duration(moment().diff(postedTimeUserTZ));
-  const minutes = duration.asMinutes();
-  const hours = duration.asHours();
-  const days = duration.asDays();
-  const weeks = duration.asWeeks();
-  const years = duration.asYears();
+  // const postPublishedTime = timeAgoFormatByUTC(data?.posted_at);
 
   const handleComments = async (e) => {
     e.preventDefault();
     const commentValue = e.target.comments.value;
+    setCommentPosting(true);
+    if (!user) {
+      setCommentPosting(false);
+      return Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "You're not a valid user! <br />Please login",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+    }
     if (commentValue.length < 10) {
+      setCommentPosting(false);
       return Swal.fire({
         position: "center",
         icon: "error",
@@ -61,7 +66,65 @@ const PostDetails = () => {
       comments: commentValue,
       published_at: new Date(),
     };
-    console.log(commentsData);
+    axiosSecure.post("/comments", commentsData).then((res) => {
+      setCommentPosting(false);
+      if (res.status === 200) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "You comments has been posted successfully",
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+        });
+        commentsDataRefetch();
+        e.target.reset();
+      }
+    });
+  };
+
+  const timeAgoFormatByUTC = (time) => {
+    const postedTimeUTC = moment.utc(time);
+    // Get the user's time zone (you may need to get this information from the user somehow)
+    const userTimeZone = moment.tz.guess();
+    // Convert the posted time to the user's time zone
+    const postedTimeUserTZ = postedTimeUTC.tz(userTimeZone);
+    // Calculate the duration
+    const duration = moment.duration(moment().diff(postedTimeUserTZ));
+    const minutes = duration.asMinutes();
+    const hours = duration.asHours();
+    const days = duration.asDays();
+    const weeks = duration.asWeeks();
+    const years = duration.asYears();
+
+    return (
+      <>
+        {(minutes < 60 && (
+          <>{`${Math.round(minutes)} minute${
+            Math.round(minutes) !== 1 ? "s" : ""
+          } ago`}</>
+        )) ||
+          (hours < 24 && (
+            <>{`${Math.round(hours)} hour${
+              Math.round(hours) !== 1 ? "s" : ""
+            } ago`}</>
+          )) ||
+          (days < 7 && (
+            <>{`${Math.round(days)} day${
+              Math.round(days) !== 1 ? "s" : ""
+            } ago`}</>
+          )) ||
+          (weeks < 52 && (
+            <>{`${Math.round(weeks)} week${
+              Math.round(weeks) !== 1 ? "s" : ""
+            } ago`}</>
+          )) || (
+            <>{`${Math.round(years)} year${
+              Math.round(years) !== 1 ? "s" : ""
+            } ago`}</>
+          )}
+      </>
+    );
   };
 
   return (
@@ -130,30 +193,7 @@ const PostDetails = () => {
                         <div>
                           <div className="font-bold">{data?.author?.name}</div>
                           <div className="text-xs font-semibold">
-                            {(minutes < 60 && (
-                              <>{`${Math.round(minutes)} minute${
-                                Math.round(minutes) !== 1 ? "s" : ""
-                              } ago`}</>
-                            )) ||
-                              (hours < 24 && (
-                                <>{`${Math.round(hours)} hour${
-                                  Math.round(hours) !== 1 ? "s" : ""
-                                } ago`}</>
-                              )) ||
-                              (days < 7 && (
-                                <>{`${Math.round(days)} day${
-                                  Math.round(days) !== 1 ? "s" : ""
-                                } ago`}</>
-                              )) ||
-                              (weeks < 52 && (
-                                <>{`${Math.round(weeks)} week${
-                                  Math.round(weeks) !== 1 ? "s" : ""
-                                } ago`}</>
-                              )) || (
-                                <>{`${Math.round(years)} year${
-                                  Math.round(years) !== 1 ? "s" : ""
-                                } ago`}</>
-                              )}
+                            {timeAgoFormatByUTC(data?.posted_at)}
                           </div>
                         </div>
                       </div>
@@ -236,219 +276,47 @@ const PostDetails = () => {
                         <div className="text-end">
                           <Button type="submit" variant="contained">
                             Post
+                            {commentPosting && (
+                              <span className="loading loading-spinner loading-xs ml-1" />
+                            )}
                           </Button>
                         </div>
                       </form>
                     </div>
                     <div className="w-full md:w-4/6 space-y-3">
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card bg-base-100 shadow">
-                        <div className="card-body">
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              alt={data?.author?.name}
-                              src={data?.author?.profile_pic}
-                            />
-                            <div>
-                              <div className="font-bold">
-                                {data?.author?.name}
-                              </div>
-                              <div className="text-xs font-semibold">
-                                4 days ago
-                              </div>
-                            </div>
-                          </div>
-                          <p>
-                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
-                            consectetur, adipisicing elit. Fuga, animi
-                            consectetur! Vero pariatur dolorum deleniti alias
-                            fuga! Obcaecati deleniti dolore sequi debitis, ab
-                            itaque repudiandae? Nihil impedit dicta aspernatur
-                            quae.
-                          </p>
-                        </div>
-                      </div>
+                      {commentsData?.status === 200 &&
+                        commentsData?.data.length > 0 && (
+                          <>
+                            {commentsData?.data?.map((comment) => {
+                              return (
+                                <div
+                                  key={comment?._id}
+                                  className="card bg-base-100 shadow"
+                                >
+                                  <div className="card-body">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar
+                                        alt={comment?.author?.name}
+                                        src={comment?.author?.photo}
+                                      />
+                                      <div>
+                                        <div className="font-bold">
+                                          {comment?.author?.name}
+                                        </div>
+                                        <div className="text-xs font-semibold">
+                                          {timeAgoFormatByUTC(
+                                            comment?.published_at
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <p>{comment?.comments}</p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </>
+                        )}
                     </div>
                   </div>
                 </article>
