@@ -8,13 +8,17 @@ import { HiOutlineLocationMarker, HiOutlinePhone } from "react-icons/hi";
 import { MdOutlineLocationCity, MdOutlineBloodtype } from "react-icons/md";
 import { TbUrgent } from "react-icons/tb";
 
-import { Avatar } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import DomHead from "../../components/shared/DomHead/DomHead";
 import Skeleton from "react-loading-skeleton";
 import React from "react";
+import Swal from "sweetalert2";
+import useAuth from "../../hooks/useAuth";
 
 const PostDetails = () => {
   const { id } = useParams();
+
+  const { user } = useAuth();
 
   const { singlePostData, singlePostDataLoading } = useSinglePostData(id);
 
@@ -33,6 +37,32 @@ const PostDetails = () => {
   const days = duration.asDays();
   const weeks = duration.asWeeks();
   const years = duration.asYears();
+
+  const handleComments = async (e) => {
+    e.preventDefault();
+    const commentValue = e.target.comments.value;
+    if (commentValue.length < 10) {
+      return Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Please enter a valid comments",
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
+    }
+    const commentsData = {
+      author: {
+        name: user?.displayName,
+        uid: user?.uid,
+        photo: user?.photoURL,
+      },
+      post_id: id,
+      comments: commentValue,
+      published_at: new Date(),
+    };
+    console.log(commentsData);
+  };
 
   return (
     <>
@@ -184,6 +214,242 @@ const PostDetails = () => {
                         </React.Fragment>
                       ))}
                     </p>
+                  </div>
+                  <div className="divider w-1/2 mx-auto pb-10"></div>
+                  {/* Comments */}
+                  <div className="flex flex-col md:flex-row gap-5">
+                    <div className="w-full md:w-2/6 space-y-4">
+                      <form
+                        onSubmit={handleComments}
+                        className="p-5 space-y-3 bg-base-100 card shadow md:sticky md:top-20"
+                      >
+                        <h2 className="text-lg md:text-xl font-semibold">
+                          Comments here{" "}
+                        </h2>
+                        <textarea
+                          className="post-form-field w-full"
+                          name="comments"
+                          id="comments-data"
+                          rows="3"
+                          placeholder="Write comments here"
+                        ></textarea>
+                        <div className="text-end">
+                          <Button type="submit" variant="contained">
+                            Post
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                    <div className="w-full md:w-4/6 space-y-3">
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card bg-base-100 shadow">
+                        <div className="card-body">
+                          <div className="flex items-center gap-3">
+                            <Avatar
+                              alt={data?.author?.name}
+                              src={data?.author?.profile_pic}
+                            />
+                            <div>
+                              <div className="font-bold">
+                                {data?.author?.name}
+                              </div>
+                              <div className="text-xs font-semibold">
+                                4 days ago
+                              </div>
+                            </div>
+                          </div>
+                          <p>
+                            Lorem ipsum dolor sit. Lorem ipsum dolor sit amet
+                            consectetur, adipisicing elit. Fuga, animi
+                            consectetur! Vero pariatur dolorum deleniti alias
+                            fuga! Obcaecati deleniti dolore sequi debitis, ab
+                            itaque repudiandae? Nihil impedit dicta aspernatur
+                            quae.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </article>
               )}
