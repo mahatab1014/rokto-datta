@@ -35,6 +35,7 @@ async function run() {
     const database = client.db("RoktoDatta_DB");
     const postCollection = database.collection("donation_posts");
     const commentsCollection = database.collection("donation_comments");
+    const usersCollection = database.collection("users");
 
     // Donation Post CRUD Operations
     app.post("/api/v1/posts", async (req, res) => {
@@ -292,6 +293,90 @@ async function run() {
           data: [],
         };
         res.status(500).send(resultData);
+      }
+    });
+
+    // Users CRUD Operations
+    app.patch("/api/v1/users", async (req, res) => {
+      const data = req.body;
+      const { uid } = req.query;
+      const filteredData = Object.keys(data).reduce((acc, key) => {
+        const value = data[key];
+
+        if (
+          value !== undefined &&
+          value !== null &&
+          !(typeof value === "string" && value.length < 1)
+        ) {
+          acc[key] = value;
+        }
+
+        return acc;
+      }, {});
+
+      try {
+        const filter = { uid: uid };
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: filteredData,
+        };
+
+        const result = await usersCollection.findOneAndUpdate(
+          filter,
+          updateDoc,
+          options
+        );
+
+        const resultData = {
+          status: 200,
+          message: "ok",
+          data: result,
+        };
+        res.status(200).send(resultData);
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
+    app.get("/api/v1/users", async (req, res) => {
+      const { uid } = req.query;
+      const filter = { uid: uid };
+      try {
+        const result = await usersCollection.findOne(filter);
+        const data = {
+          status: 200,
+          message: "ok",
+          data: result,
+        };
+        res.status(200).send(data);
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
+    app.get("/api/v1/donors", async (req, res) => {
+      const filter = { role: "donor" };
+      try {
+        const result = await usersCollection.find(filter).toArray();
+        const data = {
+          status: 200,
+          message: "ok",
+          data: result,
+        };
+        res.status(200).send(data);
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
       }
     });
 
