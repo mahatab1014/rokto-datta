@@ -7,7 +7,6 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 
 import Container from "../../components/ui/Container/Container";
 import LogoBan from "../../assets/images/logo/rokto-datta-ban.png";
@@ -19,8 +18,10 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useAuth from "../../hooks/useAuth";
 import { uploadImageImgBB } from "../../utility/utility";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const SignUp = () => {
+  const axiosPublic = useAxiosPublic();
   const [selectedImage, setSelectedImage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -62,7 +63,7 @@ const SignUp = () => {
     }
 
     signUpUser(email, password)
-      .then(async () => {
+      .then(async (res) => {
         let profile_pic_url;
         if (profilePicture) {
           const imageUpload = await uploadImageImgBB(profilePicture);
@@ -72,9 +73,19 @@ const SignUp = () => {
           profile_pic_url = profile_picture;
         }
 
-        console.log(profile_pic_url);
+        console.log(res);
 
-        await updateUserProfile(fullName, profile_pic_url);
+        await updateUserProfile(fullName, profile_pic_url).then(() => {
+          const data = {
+            uid: res?.user?.uid,
+            email: res?.user?.email,
+            role: "user",
+            name: fullName,
+            account_pic: profile_pic_url,
+          };
+
+          axiosPublic.patch("/users", data);
+        });
       })
       .catch((error) => setErrorMessage("Your email is already in use"));
   };

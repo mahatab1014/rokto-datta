@@ -3,57 +3,56 @@ import SvgWave from "../../../assets/images/svg/svg_wave.svg";
 import { Avatar } from "@mui/material";
 import { HiPhone, HiEnvelope } from "react-icons/hi2";
 import { MdOutlineLocationOn } from "react-icons/md";
+import PropTypes from "prop-types";
 
-const BloodDonorCard = () => {
+const BloodDonorCard = ({ donor }) => {
   return (
-    <div className="relative overflow-hidden [&>img]:hover:h-56 border rounded-box bg-base-100">
+    <div className="relative overflow-hidden [&>img]:hover:h-[250px] border rounded-box bg-base-100">
       <div className="p-5">
         <div className="flex items-start gap-4">
           <figure>
-            <Link>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+            <Link to={`/donor/${donor?._id}`}>
+              <Avatar alt={donor?.name} src={donor?.profile_pic} />
             </Link>
           </figure>
           <div>
-            <Link>
-              <h2 className="font-semibold">Mahatab Hossain Sudip</h2>
+            <Link to={`/donor/${donor?._id}`}>
+              <h2 className="font-semibold">{donor?.name}</h2>
             </Link>
             <div className="text-left text-sm -mt-1">
               <span className="font-medium">Blood Group : </span>
-              <span>AB +</span>
+              <span>{donor?.blood_group}</span>
             </div>
           </div>
         </div>
         <div className="pt-3">
-          <p className="">
-            I'm a Front-End web developer creating seamless interfaces.
-            Committed to crafting user-friendly interfaces and empowering fellow
-            developers on the journey.
-          </p>
+          <p className="">{donor?.bio}</p>
           <div className="space-y-1 mt-3">
             <Link
               className="flex items-center gap-2 text-sm font-semibold"
-              to={`tel:01775025349`}
+              to={`tel:${donor?.phone_number}`}
             >
               <HiPhone />
-              <span>01775025349</span>
+              <span>{donor?.phone_number}</span>
             </Link>
             <Link
               className="flex items-center gap-2 text-sm font-semibold"
-              to={`mailto:mhsudip815@gmail.com`}
+              to={`mailto:${donor?.email}`}
             >
               <HiEnvelope />
-              <span>mhsudip815@gmail.com</span>
+              <span>{donor?.email}</span>
             </Link>
             <div className="flex items-center gap-2 text-sm font-semibold">
               <MdOutlineLocationOn />
-              <span>Jamalpur, Mymensingh</span>
+              <span className="capitalize">
+                {donor?.district_data}, {donor?.division_data}
+              </span>
             </div>
           </div>
         </div>
       </div>
       <img
-        className="bottom-0 opacity-15 h-60 absolute object-cover transition-all pointer-events-none"
+        className="bottom-0 opacity-5 h-60 absolute object-cover transition-all pointer-events-none"
         src={SvgWave}
         alt=""
       />
@@ -62,3 +61,7 @@ const BloodDonorCard = () => {
 };
 
 export default BloodDonorCard;
+
+BloodDonorCard.propTypes = {
+  donor: PropTypes.object.isRequired,
+};

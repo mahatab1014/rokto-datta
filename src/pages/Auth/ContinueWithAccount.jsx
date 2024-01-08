@@ -2,13 +2,24 @@ import Button from "@mui/material/Button";
 import { Divider } from "@mui/material";
 import { FaFacebookF, FaGoogle, FaXTwitter } from "react-icons/fa6";
 import useAuth from "../../hooks/useAuth";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const ContinueWithAccount = () => {
   const { continueWithGoogle, continueWithFacebook, continueWithTwitter } =
     useAuth();
+  const axiosPublic = useAxiosPublic();
 
   const handleSignInWithGoogle = () => {
-    continueWithGoogle();
+    continueWithGoogle().then((res) => {
+      const data = {
+        uid: res?.user?.uid,
+        email: res?.user?.email,
+        name: res?.user?.displayName,
+        account_pic: res?.user?.photoURL,
+      };
+
+      axiosPublic.patch("/users", data);
+    });
   };
 
   const handleSignInWithFacebook = () => {
