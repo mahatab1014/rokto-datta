@@ -12,6 +12,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { uploadImageImgBB } from "../../utility/utility";
 import useDonorsData from "../../hooks/useDonorsData";
+import Skeleton from "react-loading-skeleton";
 
 const BloodDonors = () => {
   const { user } = useAuth();
@@ -144,9 +145,37 @@ const BloodDonors = () => {
         <Container>
           <div></div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {donorsData?.data?.map((donor) => (
-              <BloodDonorCard donor={donor} key={donor?._id} />
-            ))}
+            {donorsDataLoading ? (
+              <>
+                {[1, 2, 3].map((sk) => (
+                  <div
+                    key={sk}
+                    className="relative overflow-hidden [&>img]:hover:h-[250px] border rounded-box bg-base-100"
+                  >
+                    <div className="p-5">
+                      <div className="flex gap-5">
+                        <Skeleton circle className="!w-11 h-11" />
+                        <div className="flex flex-col">
+                          <Skeleton className="!w-64 !h-4" />
+                          <Skeleton className="!w-40 !h-2" />
+                        </div>
+                      </div>
+                      <div className="mt-5">
+                        <Skeleton className="h-2 !w-3/5" />
+                        <Skeleton className="h-2 !w-4/5" />
+                        <Skeleton className="h-2 !w-2/5" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                {donorsData?.data?.map((donor) => (
+                  <BloodDonorCard donor={donor} key={donor?._id} />
+                ))}
+              </>
+            )}
           </div>
         </Container>
       </section>

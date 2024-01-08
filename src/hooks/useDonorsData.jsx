@@ -3,7 +3,7 @@ import useAxiosPublic from "./useAxiosPublic";
 
 const useDonorsData = () => {
   const axiosPublic = useAxiosPublic();
-  const { data: donorsData, pending: donorsDataLoading } = useQuery({
+  const { data: donorsData, isPending: donorsDataLoading } = useQuery({
     queryKey: ["donorsData"],
     queryFn: async () => {
       const res = await axiosPublic.get("/donors");

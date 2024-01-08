@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import AllPosts from "../pages/Dashboard/AllPosts/AllPosts";
 import DonationsHistory from "../pages/Dashboard/DonationsHistory/DonationsHistory";
 import Profile from "../pages/Dashboard/Profile/Profile";
+import BloodDonorProfile from "../pages/BloodDonorProfile/BloodDonorProfile";
 
 const PublicRoutes = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const PublicRoutes = createBrowserRouter([
       {
         path: "blood-donors",
         element: <BloodDonors />,
+      },
+      {
+        path: "donor/:id",
+        element: <BloodDonorProfile />,
       },
       {
         path: "contact-us",

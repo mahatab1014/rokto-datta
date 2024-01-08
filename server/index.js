@@ -343,8 +343,14 @@ async function run() {
       }
     });
     app.get("/api/v1/users", async (req, res) => {
-      const { uid } = req.query;
-      const filter = { uid: uid };
+      const { id } = req.query;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({
+          status: 400,
+          message: "Invalid ObjectId",
+        });
+      }
+      const filter = { _id: new ObjectId(id) };
       try {
         const result = await usersCollection.findOne(filter);
         const data = {
