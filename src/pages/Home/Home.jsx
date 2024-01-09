@@ -8,8 +8,7 @@ import Skeleton from "react-loading-skeleton";
 import { Button } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import PaginationButton from "../../components/ui/PaginationButton/PaginationButton";
-import { useState } from "react";
-import usePostsCount from "../../hooks/usePostsCount";
+import { useEffect, useState } from "react";
 
 const Home = () => {
   const location = useLocation();
@@ -24,9 +23,12 @@ const Home = () => {
     page,
     rowsPerPage
   );
-  const { postsCountData } = usePostsCount();
 
-  const totalPosts = postsCountData?.count;
+  useEffect(() => {
+    setPage(0);
+  }, [postTypeParam]);
+
+  const totalPosts = postsData?.data_count;
 
   return (
     <>

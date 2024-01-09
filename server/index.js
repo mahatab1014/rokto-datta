@@ -48,18 +48,24 @@ async function run() {
 
       const pageNumber = parseInt(page) || 0;
       const sizeNumber = parseInt(size) || 10;
+      const skip = pageNumber * sizeNumber;
+      const limit = sizeNumber;
 
       try {
         const currentTime = moment().toISOString();
         if (postType === "recent") {
           const data_sort = { posted_at: -1 };
+          const totalRecentPost = await postCollection.find().count();
           const recentPosts = await postCollection
             .find()
+            .skip(skip)
+            .limit(limit)
             .sort(data_sort)
             .toArray();
           const resultData = {
             status: 200,
             message: "ok",
+            data_count: totalRecentPost,
             data: recentPosts,
           };
           res.status(200).send(resultData);
@@ -73,13 +79,17 @@ async function run() {
           const recentUrgentPost = {
             posted_at: -1,
           };
+          const urgentPostsCount = await postCollection.find(filter).count();
           const urgentPosts = await postCollection
             .find(filter)
+            .skip(skip)
+            .limit(limit)
             .sort(recentUrgentPost)
             .toArray();
           const resultData = {
             status: 200,
             message: "ok",
+            data_count: urgentPostsCount,
             data: urgentPosts,
           };
           res.status(200).send(resultData);
@@ -88,16 +98,17 @@ async function run() {
             post_type: postType,
             blood_need_deadline: { $gte: currentTime },
           };
+          const eventPostsCount = await postCollection.find(filter).count();
           const eventPosts = await postCollection.find(filter).toArray();
           const resultData = {
             status: 200,
             message: "ok",
+            data_count: eventPostsCount,
             data: eventPosts,
           };
           res.status(200).send(resultData);
         } else {
-          const skip = pageNumber * sizeNumber;
-          const limit = sizeNumber;
+          const totalPosts = await postCollection.find().count();
           const posts = await postCollection
             .find()
             .skip(skip)
@@ -106,6 +117,7 @@ async function run() {
           const resultData = {
             status: 200,
             message: "ok",
+            data_count: totalPosts,
             data: posts,
           };
           res.status(200).send(resultData);
@@ -245,24 +257,6 @@ async function run() {
           status: 500,
           message: error.message,
         });
-      }
-    });
-    app.get("/api/v1/posts-count", async (req, res) => {
-      try {
-        const count = await postCollection.estimatedDocumentCount();
-        const resultData = {
-          status: 200,
-          message: "ok",
-          count: count,
-        };
-        res.status(200).send(resultData);
-      } catch (error) {
-        const resultData = {
-          status: 500,
-          message: error.message,
-          data: null,
-        };
-        res.status(500).send(resultData);
       }
     });
 
