@@ -55,7 +55,7 @@ async function run() {
         const currentTime = moment().toISOString();
         if (postType === "recent") {
           const data_sort = { posted_at: -1 };
-          const totalRecentPost = await postCollection.find().count();
+          const totalRecentPost = await postCollection.estimatedDocumentCount();
           const recentPosts = await postCollection
             .find()
             .skip(skip)
@@ -79,7 +79,7 @@ async function run() {
           const recentUrgentPost = {
             posted_at: -1,
           };
-          const urgentPostsCount = await postCollection.find(filter).count();
+          const urgentPostsCount = await postCollection.countDocuments(filter);
           const urgentPosts = await postCollection
             .find(filter)
             .skip(skip)
@@ -98,7 +98,7 @@ async function run() {
             post_type: postType,
             blood_need_deadline: { $gte: currentTime },
           };
-          const eventPostsCount = await postCollection.find(filter).count();
+          const eventPostsCount = await postCollection.countDocuments(filter);
           const eventPosts = await postCollection.find(filter).toArray();
           const resultData = {
             status: 200,
@@ -108,7 +108,7 @@ async function run() {
           };
           res.status(200).send(resultData);
         } else {
-          const totalPosts = await postCollection.find().count();
+          const totalPosts = await postCollection.estimatedDocumentCount();
           const posts = await postCollection
             .find()
             .skip(skip)
