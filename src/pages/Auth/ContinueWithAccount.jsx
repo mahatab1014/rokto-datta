@@ -18,7 +18,7 @@ const ContinueWithAccount = () => {
         account_pic: res?.user?.photoURL,
       };
 
-      axiosPublic.patch("/users", data);
+      axiosPublic.patch(`/users?uid=${res?.user?.uid}`, data);
     });
   };
 

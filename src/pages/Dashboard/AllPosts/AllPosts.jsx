@@ -1,12 +1,30 @@
-import { Link } from "react-router-dom";
-import { MdDelete, MdEditNote } from "react-icons/md";
-import { IconButton } from "@mui/material";
+import useAuth from "../../../hooks/useAuth";
+import useUserPostInfo from "../../../hooks/useUserPostInfo";
+import { useState } from "react";
+import PaginationButton from "../../../components/ui/PaginationButton/PaginationButton";
+import DashboardPostsTable from "../../../components/ui/DashboardPostsTable/DashboardPostsTable";
+import Skeleton from "react-loading-skeleton";
 
 const AllPosts = () => {
+  const { user } = useAuth();
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const { userPostInfo, userPostInfoLoading, userPostInfoRefetch } =
+    useUserPostInfo(user?.uid, page, size);
+
   return (
     <>
       <section>
         <div className="overflow-x-auto bg-white rounded-box shadow-lg">
+          <PaginationButton
+            page={page}
+            setPage={setPage}
+            rowsPerPage={size}
+            setRowsPerPage={setSize}
+            totalPosts={userPostInfo?.total_data}
+          />
           <table className="table table-zebra">
             {/* head */}
             <thead>
@@ -21,98 +39,57 @@ const AllPosts = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th>1</th>
-                <td>
-                  <Link className="hover:underline">
-                    Urgent Blood Needed : Urgent Blood Needed
-                  </Link>
-                </td>
-                <td>Active</td>
-                <td>03</td>
-                <td>01, 05, 2024 | 10:14 am</td>
-                <td>
-                  <Link>
-                    <IconButton aria-label="edit">
-                      <MdEditNote className="text-xl lg:text-2xl" />
-                    </IconButton>
-                  </Link>
-                </td>
-                <td>
-                  <IconButton aria-label="delete">
-                    <MdDelete className="text-xl lg:text-2xl" />
-                  </IconButton>
-                </td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>
-                  <Link className="hover:underline">
-                    Urgent Blood Needed : Urgent Blood Needed
-                  </Link>
-                </td>
-                <td>Active</td>
-                <td>03</td>
-                <td>01, 05, 2024 | 10:14 am</td>
-                <td>
-                  <Link>
-                    <IconButton aria-label="edit">
-                      <MdEditNote className="text-xl lg:text-2xl" />
-                    </IconButton>
-                  </Link>
-                </td>
-                <td>
-                  <IconButton aria-label="delete">
-                    <MdDelete className="text-xl lg:text-2xl" />
-                  </IconButton>
-                </td>
-              </tr>
-              <tr>
-                <th>3</th>
-                <td>
-                  <Link className="hover:underline">
-                    Urgent Blood Needed : Urgent Blood Needed
-                  </Link>
-                </td>
-                <td>Active</td>
-                <td>03</td>
-                <td>01, 05, 2024 | 10:14 am</td>
-                <td>
-                  <Link>
-                    <IconButton aria-label="edit">
-                      <MdEditNote className="text-xl lg:text-2xl" />
-                    </IconButton>
-                  </Link>
-                </td>
-                <td>
-                  <IconButton aria-label="delete">
-                    <MdDelete className="text-xl lg:text-2xl" />
-                  </IconButton>
-                </td>
-              </tr>
-              <tr>
-                <th>4</th>
-                <td>
-                  <Link className="hover:underline">
-                    Urgent Blood Needed : Urgent Blood Needed
-                  </Link>
-                </td>
-                <td>Active</td>
-                <td>03</td>
-                <td>01, 05, 2024 | 10:14 am</td>
-                <td>
-                  <Link>
-                    <IconButton aria-label="edit">
-                      <MdEditNote className="text-xl lg:text-2xl" />
-                    </IconButton>
-                  </Link>
-                </td>
-                <td>
-                  <IconButton aria-label="delete">
-                    <MdDelete className="text-xl lg:text-2xl" />
-                  </IconButton>
-                </td>
-              </tr>
+              {userPostInfoLoading ? (
+                <>
+                  {[1, 2, 3].map((sk) => (
+                    <tr key={sk}>
+                      <td>
+                        <Skeleton />
+                      </td>
+                      <td>
+                        <Skeleton />
+                      </td>
+                      <td>
+                        <Skeleton />
+                      </td>
+                      <td>
+                        <Skeleton />
+                      </td>
+                      <td>
+                        <Skeleton />
+                      </td>
+                      <td>
+                        <Skeleton />
+                      </td>
+                      <td>
+                        <Skeleton />
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {userPostInfo?.total_data === 0 && (
+                    <tr>
+                      <td colSpan={7} className="text-lg text-center">
+                        No data found
+                      </td>
+                    </tr>
+                  )}
+                </>
+              )}
+
+              {!userPostInfoLoading && (
+                <>
+                  {userPostInfo?.data?.map((post_info, index) => (
+                    <DashboardPostsTable
+                      key={post_info?._id}
+                      post_info={post_info}
+                      index={index}
+                    />
+                  ))}
+                </>
+              )}
             </tbody>
           </table>
         </div>

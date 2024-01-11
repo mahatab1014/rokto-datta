@@ -6,6 +6,7 @@ const cors = require("cors");
 const moment = require("moment-timezone");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { Try } = require("@mui/icons-material");
 require("dotenv").config();
 
 // CORS Middleware
@@ -314,7 +315,6 @@ async function run() {
         const updateDoc = {
           $set: filteredData,
         };
-
         const result = await usersCollection.findOneAndUpdate(
           filter,
           updateDoc,
@@ -368,6 +368,82 @@ async function run() {
         const data = {
           status: 200,
           message: "ok",
+          data: result,
+        };
+        res.status(200).send(data);
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
+    app.get("/api/v1/role", async (req, res) => {
+      const { uid } = req.query;
+      try {
+        const filter = { uid: uid };
+        const userInfo = await usersCollection.findOne(filter);
+        const data = {
+          status: 200,
+          message: userInfo === null ? "user not found" : "ok",
+          role: userInfo?.role || "user",
+        };
+        res.status(200).send(data);
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
+
+    // DASHBOARD CURD OPERATIONS
+    app.get("/api/v1/user-info", async (req, res) => {
+      const { uid } = req.query;
+      try {
+        const filterUser = { uid: uid };
+        const filterTotalPosts = { "author.uid": uid };
+
+        const totalPosts = await postCollection.countDocuments(
+          filterTotalPosts
+        );
+        const userInfo = await usersCollection.findOne(filterUser);
+        const data = {
+          status: 200,
+          message: userInfo === null ? "user not found" : "ok",
+          total_posts: totalPosts,
+          user_info: userInfo,
+        };
+        res.status(200).send(data);
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
+    app.get("/api/v1/user-post-info", async (req, res) => {
+      const { uid, page, size } = req.query;
+      const pageNumber = parseInt(page) || 0;
+      const sizeNumber = parseInt(size) || 10;
+      const skip = pageNumber * sizeNumber;
+      const limit = sizeNumber;
+
+      try {
+        const filter = { "author.uid": uid };
+        const result = await postCollection
+          .find(filter)
+          .skip(skip)
+          .limit(limit)
+          .toArray();
+        const totalData = await postCollection.countDocuments(filter);
+        const data = {
+          status: 200,
+          message: "ok",
+          total_data: totalData,
           data: result,
         };
         res.status(200).send(data);
