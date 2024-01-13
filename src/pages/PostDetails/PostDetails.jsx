@@ -69,10 +69,13 @@ const PostDetails = () => {
     axiosSecure.post("/comments", commentsData).then((res) => {
       setCommentPosting(false);
       if (res.status === 200) {
+        axiosSecure.patch(`/post/${id}`, {
+          comment_count: parseInt(data?.comment_count) + 1,
+        });
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "You comments has been posted successfully",
+          title: "Thanks for your comments",
           showConfirmButton: false,
           timer: 1500,
           timerProgressBar: true,
