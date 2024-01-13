@@ -455,6 +455,40 @@ async function run() {
         });
       }
     });
+    app.delete("/api/v1/user-post-info/:id", async (req, res) => {
+      const { id } = req.params;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({
+          status: 400,
+          message: "Invalid ObjectId",
+        });
+      }
+      try {
+        const filter = { _id: new ObjectId(id) };
+        const result = await postCollection.deleteOne(filter);
+        if (result.deletedCount === 1) {
+          const data = {
+            status: 200,
+            message: "Post Deleted",
+            delete: true,
+          };
+          res.status(200).send(data);
+        } else {
+          const data = {
+            status: 200,
+            message: "Post not found",
+            delete: false,
+          };
+          res.status(200).send(data);
+        }
+      } catch (error) {
+        res.status(500).send({
+          status: 500,
+          message: error.message,
+          data: null,
+        });
+      }
+    });
 
     await client.connect();
     await client.db("admin").command({ ping: 1 });

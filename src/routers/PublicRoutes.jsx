@@ -11,6 +11,7 @@ import AllPosts from "../pages/Dashboard/AllPosts/AllPosts";
 import DonationsHistory from "../pages/Dashboard/DonationsHistory/DonationsHistory";
 import Profile from "../pages/Dashboard/Profile/Profile";
 import BloodDonorProfile from "../pages/BloodDonorProfile/BloodDonorProfile";
+import EditPost from "../pages/Dashboard/EditPost/EditPost";
 
 const PublicRoutes = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const PublicRoutes = createBrowserRouter([
           {
             path: "all-posts",
             element: <AllPosts />,
+          },
+          {
+            path: "edit-post/:id",
+            element: <EditPost />
           },
           {
             path: "donations-history",

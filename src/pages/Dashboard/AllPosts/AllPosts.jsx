@@ -4,15 +4,48 @@ import { useState } from "react";
 import PaginationButton from "../../../components/ui/PaginationButton/PaginationButton";
 import DashboardPostsTable from "../../../components/ui/DashboardPostsTable/DashboardPostsTable";
 import Skeleton from "react-loading-skeleton";
+import Swal from "sweetalert2";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const AllPosts = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const { userPostInfo, userPostInfoLoading, userPostInfoRefetch } =
     useUserPostInfo(user?.uid, page, size);
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosSecure.delete(`/user-post-info/${id}`).then((result) => {
+          if (result.data.delete) {
+            userPostInfoRefetch();
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your post has been deleted.",
+              icon: "success",
+            });
+          } else {
+            userPostInfoRefetch();
+            Swal.fire({
+              title: "Something went wrong!",
+              icon: "error",
+            });
+          }
+        });
+      }
+    });
+  };
 
   return (
     <>
@@ -83,6 +116,7 @@ const AllPosts = () => {
                 <>
                   {userPostInfo?.data?.map((post_info, index) => (
                     <DashboardPostsTable
+                      handleDelete={handleDelete}
                       key={post_info?._id}
                       post_info={post_info}
                       index={index}

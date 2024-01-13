@@ -3,11 +3,11 @@ import { MdDelete, MdEditNote } from "react-icons/md";
 import { IconButton } from "@mui/material";
 import moment from "moment";
 
-const DashboardPostsTable = ({ index, post_info }) => {
+const DashboardPostsTable = ({ index, post_info, handleDelete }) => {
   return (
     <>
       <tr>
-        <th>{index+1}</th>
+        <th>{index + 1}</th>
         <td>
           <Link to={`/post/${post_info?._id}`} className="hover:underline">
             {post_info?.title}
@@ -20,14 +20,17 @@ const DashboardPostsTable = ({ index, post_info }) => {
           {/* 01, 05, 2024 | 10:14 am */}
         </td>
         <td>
-          <Link>
+          <Link to={`/dashboard/edit-post/${post_info?._id}`}>
             <IconButton aria-label="edit">
               <MdEditNote className="text-xl lg:text-2xl" />
             </IconButton>
           </Link>
         </td>
         <td>
-          <IconButton aria-label="delete">
+          <IconButton
+            onClick={() => handleDelete(post_info?._id)}
+            aria-label="delete"
+          >
             <MdDelete className="text-xl lg:text-2xl" />
           </IconButton>
         </td>
