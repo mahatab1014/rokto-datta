@@ -8,14 +8,14 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
-// Email
-const formData = require("form-data");
-const Mailgun = require("mailgun.js");
-const mailgun = new Mailgun(formData);
-
-const mg = mailgun.client({
-  username: "api",
-  key: process.env.MAIL_GUN_API_KEY,
+// NodeMailer
+const nodemailer = require("nodemailer");
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_ADDRESS,
+    pass: process.env.EMAIL_PASS_KEY,
+  },
 });
 
 // CORS Middleware
@@ -56,49 +56,35 @@ async function run() {
       const userEmails = userResult?.map((user) => user?.email);
 
       // Send email existing user
-      mg.messages
-        .create(process.env.MAIL_GUN_SendingDomain, {
-          from: "Rokto Datta <postmaster@sandboxb3f9880011bd4afdb1d9ca558f71c0eb.mailgun.org>",
-          to: userEmails,
-          subject: `Urgent Blood Donation Request - ${data?.blood_group}`,
-          html: `<!doctype html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head><title></title><!--[if !mso]><!--><meta http-equiv="X-UA-Compatible" content="IE=edge"><!--<![endif]--><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style type="text/css">#outlook a { padding:0; }
-          body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; }
-          table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; }
-          img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; }
-          p { display:block;margin:13px 0; }</style><!--[if mso]>
-        <noscript>
-        <xml>
-        <o:OfficeDocumentSettings>
-          <o:AllowPNG/>
-          <o:PixelsPerInch>96</o:PixelsPerInch>
-        </o:OfficeDocumentSettings>
-        </xml>
-        </noscript>
-        <![endif]--><!--[if lte mso 11]>
-        <style type="text/css">
-          .mj-outlook-group-fix { width:100% !important; }
-        </style>
-        <![endif]--><!--[if !mso]><!--><link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet" type="text/css"><style type="text/css">@import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);</style><!--<![endif]--><style type="text/css">@media only screen and (min-width:480px) {
-        .mj-column-per-100 { width:100% !important; max-width: 100%; }
-      }</style><style media="screen and (min-width:480px)">.moz-text-html .mj-column-per-100 { width:100% !important; max-width: 100%; }</style><style type="text/css"></style></head><body style="word-spacing:normal;"><div><!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]--><div style="margin:0px auto;max-width:600px;"><table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;"><tbody><tr><td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;"><!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]--><div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;"><table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%"><tbody><tr><td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;"><p style="border-top:solid 4px #F45E43;font-size:1px;margin:0px auto;width:100%;"></p><!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 4px #F45E43;font-size:1px;margin:0px auto;width:550px;" role="presentation" width="550px" ><tr><td style="height:0;line-height:0;"> &nbsp;
-</td></tr></table><![endif]--></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">Dear Rokto Datta,</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">I hope this email finds you well. Your commitment to saving lives as a registered blood donor on RaktoDatta has made a significant impact on our community.</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">We are reaching out to you with an urgent request for blood donation. A fellow member of our community is currently in need of blood, and your blood type ${
-            data?.blood_group
-          } matches the requirement.</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">Details of the patient and the blood donation request:</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;"><strong>Patient's Name:</strong> ${
-            data?.author?.name
-          }<br><strong>Hospital:</strong> ${
-            data?.hospital_name
-          }<br><strong>Blood Type Required:</strong> ${
-            data?.blood_group
-          }<br><strong>Date and Time of Donation:</strong> ${moment(
-            data?.blood_need_deadline
-          ).format(
-            "DD, MM, YYYY | h:mm a"
-          )}<br></div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">Your willingness to donate could make a life-saving difference. If you are available and willing to donate, please reply to this email or contact the hospital directly at ${
-            data?.phone_number
-          }.</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">Your generosity and compassion as a blood donor are invaluable, and we appreciate your dedication to helping those in need. Thank you for being a beacon of hope in our community.</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">If you have any questions or need further assistance, please don't hesitate to contact us.</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">Thank you for your ongoing support.</div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">Best regards,<br><strong>RaktoDatta Team</strong><br>E-mail: mhsudip815@gmail.com<br><a href="https://rokto-datta.web.app">rokto-datta.web.app</a><br></div></td></tr><tr><td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;"><div style="font-family:helvetica;font-size:20px;line-height:1;text-align:left;color:#F45E43;"></div></td></tr></tbody></table></div><!--[if mso | IE]></td></tr></table><![endif]--></td></tr></tbody></table></div><!--[if mso | IE]></td></tr></table><![endif]--></div></body></html>`,
-        })
-        .then((msg) => console.log(msg)) // logs response data
-        .catch((err) => console.log(err)); // logs any error`;
+
+      let mailOptions = {
+        from: "Rokto Datta <mhsudip815@gmail.com>", // TODO: email sender
+        to: userEmails, // TODO: email receiver
+        subject: `Urgent Blood Donation Request - ${data?.blood_group}`,
+        html: `<!doctypehtml><html xmlns=http://www.w3.org/1999/xhtml xmlns:o=urn:schemas-microsoft-com:office:office xmlns:v=urn:schemas-microsoft-com:vml><meta content="text/html; charset=UTF-8"http-equiv=Content-Type><meta content="width=device-width,initial-scale=1"name=viewport><meta name=x-apple-disable-message-reformatting><meta content="IE=edge"http-equiv=X-UA-Compatible><title>Urgent Blood Donation Request - ${
+          data?.blood_group
+        }</title><style>@media only screen and (min-width:520px){.u-row{width:500px!important}.u-row .u-col{vertical-align:top}.u-row .u-col-100{width:500px!important}}@media (max-width:520px){.u-row-container{max-width:100%!important;padding-left:0!important;padding-right:0!important}.u-row .u-col{min-width:320px!important;max-width:100%!important;display:block!important}.u-row{width:100%!important}.u-col{width:100%!important}.u-col>div{margin:0 auto}}body{margin:0;padding:0}table,td,tr{vertical-align:top;border-collapse:collapse}p{margin:0}.ie-container table,.mso-container table{table-layout:fixed}*{line-height:inherit;box-sizing:border-box}a[x-apple-data-detectors=true]{color:inherit!important;text-decoration:none!important}table,td{color:#000}#u_body a{color:#00e;text-decoration:underline}@media (max-width:480px){#u_content_image_1 .v-src-width{width:auto!important}#u_content_image_1 .v-src-max-width{max-width:25%!important}}</style><body class="clean-body u_body"style=margin:0;padding:0;-webkit-text-size-adjust:100%;background-color:#e7e7e7;color:#000><table cellpadding=0 cellspacing=0 style="border-collapse:collapse;table-layout:fixed;border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;vertical-align:top;min-width:320px;margin:0 auto;background-color:#e7e7e7;width:100%"id=u_body><tr style=vertical-align:top><td style=word-break:break-word;border-collapse:collapse!important;vertical-align:top><div style=padding:0;background-color:transparent class=u-row-container><div style="margin:0 auto;min-width:320px;max-width:500px;overflow-wrap:break-word;word-wrap:break-word;word-break:break-word;background-color:transparent"class=u-row><div style=border-collapse:collapse;display:table;width:100%;height:100%;background-color:transparent><div style=max-width:320px;min-width:500px;display:table-cell;vertical-align:top class="u-col u-col-100"><div style=height:100%;width:100%!important;border-radius:0;-webkit-border-radius:0;-moz-border-radius:0><div style="box-sizing:border-box;height:100%;padding:0;border-top:0 solid transparent;border-left:0 solid transparent;border-right:0 solid transparent;border-bottom:0 solid transparent;border-radius:0;-webkit-border-radius:0;-moz-border-radius:0"><table cellpadding=0 cellspacing=0 border=0 width=100% style=font-family:arial,helvetica,sans-serif role=presentation id=u_content_image_1><tr><td style=overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif align=left><table cellpadding=0 cellspacing=0 border=0 width=100%><tr><td style=padding-right:0;padding-left:0 align=center><a href=https://rokto-datta.web.app target=_blank><img align=center alt=""border=0 class="v-src-max-width v-src-width"src=https://i.ibb.co/Gk5wMps/rokto-datta-ban.png style=outline:0;text-decoration:none;-ms-interpolation-mode:bicubic;clear:both;display:inline-block!important;border:none;height:auto;float:none;width:25%;max-width:120px width=120></a></table></table><table cellpadding=0 cellspacing=0 border=0 width=100% style=font-family:arial,helvetica,sans-serif role=presentation><tr><td style=overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif align=left><table cellpadding=0 cellspacing=0 border=0 width=100% style="border-collapse:collapse;table-layout:fixed;border-spacing:0;mso-table-lspace:0;mso-table-rspace:0;vertical-align:top;border-top:1px solid #bbb;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%"align=center height=0px><tr style=vertical-align:top><td style=word-break:break-word;border-collapse:collapse!important;vertical-align:top;font-size:0;line-height:0;mso-line-height-rule:exactly;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%><span> </span></table></table><table cellpadding=0 cellspacing=0 border=0 width=100% style=font-family:arial,helvetica,sans-serif role=presentation><tr><td style=overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:arial,helvetica,sans-serif align=left><div style=font-size:14px;line-height:140%;text-align:left;word-wrap:break-word><p style=line-height:140%>Dear Rokto Datta,</p><br><p style=line-height:140%>I hope this email finds you well. Your commitment to saving lives as a registered blood donor on RaktoDatta has made a significant impact on our community.</p><br><p style=line-height:140%>We are reaching out to you with an urgent request for blood donation. A fellow member of our community is currently in need of blood, and your blood type ${
+          data?.blood_group
+        } matches the requirement.</p><br><p style=line-height:140%>Details of the patient and the blood donation request:</p><br><div><ul style=list-style:none;padding-left:0><li><strong>Patient's Name:</strong> ${
+          data?.author?.name
+        }<li><strong>Hospital:</strong> ${
+          data?.hospital_name
+        }<li><strong>Blood Type Required:</strong> ${
+          data?.blood_group
+        }<li><strong>Date and Time of Donation:</strong> ${moment(
+          data?.blood_need_deadline
+        ).format(
+          "DD,MM, YYYY | h:mm a"
+        )}</ul></div><div><p style=line-height:140%>Your willingness to donate could make a life-saving difference. If you are available and willing to donate, please reply to this email or contact the hospital directly at ${
+          data?.phone_number
+        }.</p><br></div><div><p style=line-height:140%>Your generosity and compassion as a blood donor are invaluable, and we appreciate your dedication to helping those in need. Thank you for being a beacon of hope in our community.</p><br></div><div><p style=line-height:140%>If you have any questions or need further assistance, please don't hesitate to contact us.</p><br><p style=line-height:140%>Thank you for your ongoing support.</p><br>Best regards,<br><strong>Team RaktoDatta</strong><br><a href=mailto:mhsudip815@gmail.com target=_blank rel=noopener>mhsudip815@gmail.com</a><br><a href=https://rokto-datta.web.app/ target=_blank rel=noopener data-saferedirecturl="https://www.google.com/url?q=https://rokto-datta.web.app&source=gmail&ust=1705297758200000&usg=AOvVaw0xXukfPi1UJVI1gv0EKOdn">rokto-datta.web.app</a> <br><br></div></div></table></div></div></div></div></div></div></table>`,
+      };
+      transporter.sendMail(mailOptions, (err, data) => {
+        if (err) {
+          return console.log("Error occurs");
+        }
+        return console.log("Email sent!!!");
+      });
 
       res.send(result).status(200);
     });
