@@ -12,6 +12,9 @@ import DonationsHistory from "../pages/Dashboard/DonationsHistory/DonationsHisto
 import Profile from "../pages/Dashboard/Profile/Profile";
 import BloodDonorProfile from "../pages/BloodDonorProfile/BloodDonorProfile";
 import EditPost from "../pages/Dashboard/EditPost/EditPost";
+import NotFound from "../pages/ErrorPages/NotFound";
+import DashBoardError from "../pages/ErrorPages/DashBoardError";
+import ContactUs from "../pages/Contact/ContactUs";
 
 const PublicRoutes = createBrowserRouter([
   {
@@ -35,7 +38,8 @@ const PublicRoutes = createBrowserRouter([
         element: <BloodDonorProfile />,
       },
       {
-        path: "contact-us",
+        path: "contact",
+        element: <ContactUs />
       },
       {
         path: "dashboard",
@@ -51,7 +55,7 @@ const PublicRoutes = createBrowserRouter([
           },
           {
             path: "edit-post/:id",
-            element: <EditPost />
+            element: <EditPost />,
           },
           {
             path: "donations-history",
@@ -61,6 +65,10 @@ const PublicRoutes = createBrowserRouter([
             path: "profile",
             element: <Profile />,
           },
+          {
+            path: "*",
+            element: <DashBoardError />
+          }
         ],
       },
       {
@@ -70,6 +78,10 @@ const PublicRoutes = createBrowserRouter([
       {
         path: "sign-in",
         element: <SignIn />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
